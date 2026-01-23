@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Tag, Modal, Form, Input, Select, message, Space, Popconfirm, Descriptions } from 'antd';
 import { EditOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import { adminAPI } from '../services/api';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -32,11 +32,10 @@ const FeedbackManagement: React.FC = () => {
   const fetchFeedbacks = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('admin_token');
-      const response = await axios.get('/api/v1/admin/feedback', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setFeedbacks(response.data.data.feedbacks || []);
+      const response = await adminAPI.getFeedbacks({});
+      if (response.code === 0 && response.data) {
+        setFeedbacks(response.data.feedbacks || []);
+      }
     } catch (error) {
       message.error('获取反馈列表失败');
     } finally {
@@ -50,11 +49,10 @@ const FeedbackManagement: React.FC = () => {
 
   const handleView = async (id: string) => {
     try {
-      const token = localStorage.getItem('admin_token');
-      const response = await axios.get(`/api/v1/admin/feedback/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setViewingFeedback(response.data.data);
+      const response = await adminAPI.getFeedback(id);
+      if (response.code === 0 && response.data) {
+        setViewingFeedback(response.data);
+      }
       setIsViewModalVisible(true);
     } catch (error) {
       message.error('获取反馈详情失败');
@@ -74,11 +72,7 @@ const FeedbackManagement: React.FC = () => {
     if (!updatingFeedback) return;
     
     try {
-      const token = localStorage.getItem('admin_token');
-      await axios.put(`/api/v1/admin/feedback/${updatingFeedback.id}/status`, values, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
+      await adminAPI.updateFeedbackStatus(updatingFeedback.id, values);
       message.success('更新成功');
       setIsUpdateModalVisible(false);
       fetchFeedbacks();
@@ -89,11 +83,7 @@ const FeedbackManagement: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const token = localStorage.getItem('admin_token');
-      await axios.delete(`/api/v1/admin/feedback/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
+      await adminAPI.deleteFeedback(id);
       message.success('删除成功');
       fetchFeedbacks();
     } catch (error) {

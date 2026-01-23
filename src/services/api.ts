@@ -88,6 +88,24 @@ export const adminAPI = {
     return response.data;
   },
 
+  // 用户反馈管理
+  getFeedbacks: async (params?: { page?: number; page_size?: number; status?: string; type?: string; keyword?: string; user_id?: string }) => {
+    const response = await api.get('/admin/feedback', { params });
+    return response.data;
+  },
+  getFeedback: async (id: string) => {
+    const response = await api.get(`/admin/feedback/${id}`);
+    return response.data;
+  },
+  updateFeedbackStatus: async (id: string, data: { status: string; response?: string }) => {
+    const response = await api.put(`/admin/feedback/${id}/status`, data);
+    return response.data;
+  },
+  deleteFeedback: async (id: string) => {
+    const response = await api.delete(`/admin/feedback/${id}`);
+    return response.data;
+  },
+
   // 随机匹配管理
   getRandomMatchRecords: async (params: { page?: number; page_size?: number; status?: string; keyword?: string; user_id?: string }) => {
     const response = await api.get('/admin/random-match', { params });
@@ -238,6 +256,42 @@ export const adminAPI = {
   },
   deleteMeditationAssetsBatch: async (ids: string[]) => {
     const response = await api.post('/admin/meditation-assets/delete-batch', { ids });
+    return response.data;
+  },
+
+  // 帮助中心 - 分类管理
+  getHelpCategories: async (params?: { with_articles?: boolean }) => {
+    const response = await api.get('/admin/help-categories', { params });
+    return response.data;
+  },
+  createHelpCategory: async (data: { name: string; order?: number }) => {
+    const response = await api.post('/admin/help-categories', data);
+    return response.data;
+  },
+  updateHelpCategory: async (id: string, data: { name?: string; order?: number }) => {
+    const response = await api.put(`/admin/help-categories/${id}`, data);
+    return response.data;
+  },
+  deleteHelpCategory: async (id: string) => {
+    const response = await api.delete(`/admin/help-categories/${id}`);
+    return response.data;
+  },
+
+  // 帮助中心 - 文章管理
+  getHelpArticles: async (params?: { page?: number; page_size?: number; category_id?: string; q?: string }) => {
+    const response = await api.get('/admin/help-articles', { params });
+    return response.data;
+  },
+  createHelpArticle: async (data: any) => {
+    const response = await api.post('/admin/help-articles', data);
+    return response.data;
+  },
+  updateHelpArticle: async (id: string, data: any) => {
+    const response = await api.put(`/admin/help-articles/${id}`, data);
+    return response.data;
+  },
+  deleteHelpArticle: async (id: string) => {
+    const response = await api.delete(`/admin/help-articles/${id}`);
     return response.data;
   },
 

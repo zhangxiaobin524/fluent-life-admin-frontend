@@ -186,6 +186,12 @@ const defaultMenuItems: MenuItem[] = [
         icon: Bell,
         path: '/notifications',
       },
+      {
+        key: 'user-settings',
+        label: '用户设置管理',
+        icon: Settings,
+        path: '/user-settings',
+      },
     ],
   },
   {
@@ -261,6 +267,18 @@ const defaultMenuItems: MenuItem[] = [
         label: '用户反馈',
         icon: MessageCircle,
         path: '/feedback',
+      },
+      {
+        key: 'reports',
+        label: '舉報管理',
+        icon: Shield,
+        path: '/reports',
+      },
+      {
+        key: 'sensitive-words',
+        label: '敏感詞管理',
+        icon: Shield,
+        path: '/sensitive-words',
       },
     ],
   },

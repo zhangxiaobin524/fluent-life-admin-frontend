@@ -34,6 +34,8 @@ import Announcements from './pages/announcements';
 import FeatureGuides from './pages/feature-guides';
 import Versions from './pages/versions';
 import Notifications from './pages/Notifications';
+import ReportManagement from './pages/reports/ReportManagement';
+import SensitiveWords from './pages/reports/SensitiveWords';
 import Layout from './components/Layout';
 
 function App() {
@@ -442,6 +444,30 @@ function App() {
             isAuthenticated ? (
               <Layout onLogout={() => setIsAuthenticated(false)}>
                 <Notifications />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <ReportManagement />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/sensitive-words"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <SensitiveWords />
               </Layout>
             ) : (
               <Navigate to="/login" replace />

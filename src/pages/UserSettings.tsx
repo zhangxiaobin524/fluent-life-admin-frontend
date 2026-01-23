@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Tag, Modal, Form, Input, Select, Switch, message, Space, Popconfirm } from 'antd';
 import { EditOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import { adminAPI } from '../services/api';
 
 const { Option } = Select;
 
@@ -38,11 +38,10 @@ const UserSettings: React.FC = () => {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('admin_token');
-      const response = await axios.get('/api/v1/admin/user-settings', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setSettings(response.data.data.settings || []);
+      const response = await adminAPI.getUserSettings({});
+      if (response.code === 0 && response.data) {
+        setSettings(response.data.settings || []);
+      }
     } catch (error) {
       message.error('获取用户设置失败');
     } finally {
@@ -64,12 +63,12 @@ const UserSettings: React.FC = () => {
     if (!editingSetting) return;
     
     try {
-      const token = localStorage.getItem('admin_token');
-      await axios.put(`/api/v1/admin/user-settings/${editingSetting.user_id}`, values, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      message.success('更新成功');
+      const res = await adminAPI.updateUserSettings(editingSetting.user_id, values);
+      if (res.code === 0) {
+        message.success('更新成功');
+      } else {
+        message.error(res.message || '更新失败');
+      }
       setIsModalVisible(false);
       fetchSettings();
     } catch (error) {
@@ -79,12 +78,12 @@ const UserSettings: React.FC = () => {
 
   const handleReset = async (userId: string) => {
     try {
-      const token = localStorage.getItem('admin_token');
-      await axios.post(`/api/v1/admin/user-settings/${userId}/reset`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      message.success('重置成功');
+      const res = await adminAPI.resetUserSettings(userId);
+      if (res.code === 0) {
+        message.success('重置成功');
+      } else {
+        message.error(res.message || '重置失败');
+      }
       fetchSettings();
     } catch (error) {
       message.error('重置失败');

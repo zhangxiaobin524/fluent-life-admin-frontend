@@ -88,6 +88,20 @@ export const adminAPI = {
     return response.data;
   },
 
+  // 用户设置管理
+  getUserSettings: async (params?: { page?: number; page_size?: number }) => {
+    const response = await api.get('/admin/user-settings', { params });
+    return response.data;
+  },
+  updateUserSettings: async (userId: string, data: any) => {
+    const response = await api.put(`/admin/user-settings/${userId}`, data);
+    return response.data;
+  },
+  resetUserSettings: async (userId: string) => {
+    const response = await api.post(`/admin/user-settings/${userId}/reset`);
+    return response.data;
+  },
+
   // 用户反馈管理
   getFeedbacks: async (params?: { page?: number; page_size?: number; status?: string; type?: string; keyword?: string; user_id?: string }) => {
     const response = await api.get('/admin/feedback', { params });
@@ -113,6 +127,40 @@ export const adminAPI = {
   },
   toggleRoom: async (id: string) => {
     const response = await api.patch(`/admin/rooms/${id}/toggle`);
+    return response.data;
+  },
+
+  // 操作日志
+  getOperationLogs: async (params: { page?: number; page_size?: number; user_id?: string; action?: string; start_time?: string; end_time?: string }) => {
+    const response = await api.get('/admin/operation-logs', { params });
+    return response.data;
+  },
+
+  // 关注/收藏管理
+  getFollows: async (params: { page?: number; page_size?: number; follower_id?: string; followee_id?: string }) => {
+    const response = await api.get('/admin/follows', { params });
+    return response.data;
+  },
+  deleteFollowsBatch: async (ids: string[]) => {
+    const response = await api.post('/admin/follows/delete-batch', { ids });
+    return response.data;
+  },
+  getPostCollections: async (params: { page?: number; page_size?: number; user_id?: string; post_id?: string }) => {
+    const response = await api.get('/admin/post-collections', { params });
+    return response.data;
+  },
+  deletePostCollectionsBatch: async (ids: string[]) => {
+    const response = await api.post('/admin/post-collections/delete-batch', { ids });
+    return response.data;
+  },
+
+  // 点赞管理
+  getPostLikes: async (params: { page?: number; page_size?: number; post_id?: string; user_id?: string }) => {
+    const response = await api.get('/admin/post-likes', { params });
+    return response.data;
+  },
+  deletePostLikesBatch: async (ids: string[]) => {
+    const response = await api.post('/admin/post-likes/delete-batch', { ids });
     return response.data;
   },
 
@@ -591,6 +639,38 @@ export const adminAPI = {
   },
   deleteFeatureGuide: async (id: string) => {
     const response = await api.delete(`/admin/feature-guides/${id}`);
+    return response.data;
+  },
+
+  // 舉報管理
+  getReports: async (params?: { page?: number; page_size?: number; status?: string; type?: string }) => {
+    const response = await api.get('/admin/reports', { params });
+    return response.data;
+  },
+  getReport: async (id: string) => {
+    const response = await api.get(`/admin/reports/${id}`);
+    return response.data;
+  },
+  updateReportStatus: async (id: string, data: { status: string; admin_reply?: string; action?: string }) => {
+    const response = await api.put(`/admin/reports/${id}/status`, data);
+    return response.data;
+  },
+
+  // 敏感詞管理
+  getSensitiveWords: async (params?: { page?: number; page_size?: number; is_active?: boolean }) => {
+    const response = await api.get('/admin/sensitive-words', { params });
+    return response.data;
+  },
+  createSensitiveWord: async (data: { word: string; level: number; is_active: boolean }) => {
+    const response = await api.post('/admin/sensitive-words', data);
+    return response.data;
+  },
+  updateSensitiveWord: async (id: string, data: { word?: string; level?: number; is_active?: boolean }) => {
+    const response = await api.put(`/admin/sensitive-words/${id}`, data);
+    return response.data;
+  },
+  deleteSensitiveWord: async (id: string) => {
+    const response = await api.delete(`/admin/sensitive-words/${id}`);
     return response.data;
   },
 

@@ -628,7 +628,7 @@ const Permission: React.FC = () => {
               </FormItem>
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <Button variant="secondary" onClick={() => setShowRoleModal(false)}>
+              <Button variant="default" onClick={() => setShowRoleModal(false)}>
                 取消
               </Button>
               <Button variant="primary" onClick={handleSaveRole}>
@@ -693,7 +693,7 @@ const Permission: React.FC = () => {
               </FormItem>
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <Button variant="secondary" onClick={() => setShowMenuModal(false)}>
+              <Button variant="default" onClick={() => setShowMenuModal(false)}>
                 取消
               </Button>
               <Button variant="primary" onClick={handleSaveMenu}>

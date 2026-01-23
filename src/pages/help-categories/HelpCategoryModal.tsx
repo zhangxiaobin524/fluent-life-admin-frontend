@@ -83,7 +83,7 @@ const HelpCategoryModal: React.FC<Props> = ({ visible, editingItem, onClose }) =
         </FormItem>
 
         <div className="flex justify-end gap-3 mt-6">
-          <Button variant="ghost" onClick={onClose} disabled={loading}>
+          <Button variant="default" onClick={onClose} disabled={loading}>
             取消
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>

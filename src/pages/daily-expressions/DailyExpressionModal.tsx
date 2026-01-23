@@ -142,7 +142,7 @@ const DailyExpressionModal: React.FC<Props> = ({ visible, editingItem, onClose }
         </div>
 
         <div className="mt-6 flex justify-end gap-4">
-          <Button onClick={onClose} variant="secondary">
+          <Button onClick={onClose} variant="default">
             取消
           </Button>
           <Button onClick={handleSubmit} loading={loading}>

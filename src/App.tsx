@@ -29,6 +29,11 @@ import FollowsCollections from './pages/FollowsCollections';
 import PostLikes from './pages/PostLikes';
 import ExposureModules from './pages/exposure-modules';
 import Videos from './pages/Videos';
+import MeditationAssets from './pages/MeditationAssets';
+import Announcements from './pages/announcements';
+import FeatureGuides from './pages/feature-guides';
+import Versions from './pages/versions';
+import Notifications from './pages/Notifications';
 import Layout from './components/Layout';
 
 function App() {
@@ -383,9 +388,69 @@ function App() {
             )
           }
         />
-        </Routes>
-      </BrowserRouter>
-    </MenuProvider>
+        <Route
+          path="/meditation-assets"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <MeditationAssets />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/announcements"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <Announcements />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/feature-guides"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <FeatureGuides />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/versions"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <Versions />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <Notifications />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  </MenuProvider>
   );
 }
 

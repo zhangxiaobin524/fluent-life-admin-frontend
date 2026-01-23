@@ -180,7 +180,7 @@ const ExposureModuleModal: React.FC<ExposureModuleModalProps> = ({
           </FormItem>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button type="button" variant="secondary" onClick={onClose}>
+            <Button type="button" variant="default" onClick={onClose}>
               取消
             </Button>
             <Button type="submit" loading={loading}>

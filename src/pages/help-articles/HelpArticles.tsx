@@ -143,8 +143,8 @@ const HelpArticles: React.FC = () => {
       render: (_: any, item: HelpArticle) => (
         <div className="flex gap-2">
           <Button
-            variant="ghost"
-            size="sm"
+            variant="default"
+            size="small"
             onClick={() => handleEdit(item)}
             className="text-green-600 hover:text-green-700"
           >
@@ -152,8 +152,8 @@ const HelpArticles: React.FC = () => {
             编辑
           </Button>
           <Button
-            variant="ghost"
-            size="sm"
+            variant="default"
+            size="small"
             onClick={() => handleDelete(item.id)}
             className="text-red-600 hover:text-red-700"
           >

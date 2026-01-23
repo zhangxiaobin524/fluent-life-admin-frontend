@@ -337,7 +337,7 @@ const ExposureStepsModal: React.FC<ExposureStepsModalProps> = ({
                     拖拽左侧图标可调整步骤顺序
                   </p>
                 </div>
-                <Button onClick={handleAddStep} icon={<Plus size={16} />} size="sm">
+                <Button onClick={handleAddStep} icon={<Plus size={16} />} size="small">
                   添加步骤
                 </Button>
               </div>
@@ -404,7 +404,7 @@ const ExposureStepsModal: React.FC<ExposureStepsModalProps> = ({
               )}
 
               <div className="flex justify-end gap-3 pt-6 border-t mt-6">
-                <Button variant="secondary" onClick={onClose}>
+                <Button variant="default" onClick={onClose}>
                   关闭
                 </Button>
               </div>
@@ -472,7 +472,7 @@ const ExposureStepsModal: React.FC<ExposureStepsModalProps> = ({
                   <Button
                     type="button"
                     variant="primary"
-                    size="sm"
+                    size="small"
                     onClick={() => {
                       setPopupConfigs([...popupConfigs, { keywords: '', title: '', content: '' }]);
                     }}
@@ -557,7 +557,7 @@ const ExposureStepsModal: React.FC<ExposureStepsModalProps> = ({
               </FormItem>
 
               <div className="flex justify-end gap-3 pt-4 border-t">
-                <Button type="button" variant="secondary" onClick={() => setShowStepForm(false)}>
+                <Button type="button" variant="default" onClick={() => setShowStepForm(false)}>
                   取消
                 </Button>
                 <Button type="submit" loading={loading}>

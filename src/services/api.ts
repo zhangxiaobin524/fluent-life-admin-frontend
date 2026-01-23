@@ -15,6 +15,16 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  // 如果是 FormData，刪除 Content-Type header，讓瀏覽器自動設置 multipart/form-data 和 boundary
+  if (config.data instanceof FormData) {
+    // 刪除所有可能的 Content-Type 設置
+    delete config.headers['Content-Type'];
+    delete config.headers['content-type'];
+    if (config.headers.common) {
+      delete config.headers.common['Content-Type'];
+      delete config.headers.common['content-type'];
+    }
+  }
   return config;
 });
 
@@ -161,6 +171,73 @@ export const adminAPI = {
   },
   deleteDailyExpressionsBatch: async (ids: string[]) => {
     const response = await api.post('/admin/daily-expressions/delete-batch', { ids });
+    return response.data;
+  },
+
+  // 冥想资源管理
+  getMeditationAssets: async (params?: { page?: number; page_size?: number; keyword?: string; asset_type?: string; is_active?: string }) => {
+    const response = await api.get('/admin/meditation-assets', { params });
+    return response.data;
+  },
+  getMeditationAsset: async (id: string) => {
+    const response = await api.get(`/admin/meditation-assets/${id}`);
+    return response.data;
+  },
+  createMeditationAsset: async (data: any, file?: File) => {
+    if (file) {
+      // 使用 FormData 上传文件
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('asset_type', String(data.asset_type || ''));
+      formData.append('title', String(data.title || ''));
+      
+      if (data.linked_audio_id) {
+        formData.append('linked_audio_id', String(data.linked_audio_id));
+      }
+      
+      // 確保 order 始終作為字符串發送，包括 0 和負數
+      // 使用 Number.isInteger 檢查是否為有效數字
+      if (data.order !== undefined && data.order !== null && Number.isInteger(data.order)) {
+        formData.append('order', String(data.order));
+      } else {
+        // 默認值為 0
+        formData.append('order', '0');
+      }
+      
+      // 處理 is_active
+      if (data.is_active !== undefined && data.is_active !== null) {
+        formData.append('is_active', String(data.is_active === true || data.is_active === 'true'));
+      } else {
+        formData.append('is_active', 'true');
+      }
+      
+      // 處理 duration（僅音頻需要）
+      if (data.duration !== undefined && data.duration !== null && data.duration !== '') {
+        const duration = Number(data.duration);
+        if (!isNaN(duration) && duration >= 0) {
+          formData.append('duration', String(Math.floor(duration)));
+        }
+      }
+      
+      // 請求攔截器會自動處理 FormData 的 Content-Type
+      const response = await api.post('/admin/meditation-assets', formData);
+      return response.data;
+    } else {
+      // 使用 JSON 方式
+      const response = await api.post('/admin/meditation-assets', data);
+      return response.data;
+    }
+  },
+  updateMeditationAsset: async (id: string, data: any) => {
+    const response = await api.put(`/admin/meditation-assets/${id}`, data);
+    return response.data;
+  },
+  deleteMeditationAsset: async (id: string) => {
+    const response = await api.delete(`/admin/meditation-assets/${id}`);
+    return response.data;
+  },
+  deleteMeditationAssetsBatch: async (ids: string[]) => {
+    const response = await api.post('/admin/meditation-assets/delete-batch', { ids });
     return response.data;
   },
 
@@ -319,6 +396,176 @@ export const adminAPI = {
   },
   deleteMenu: async (id: string) => {
     const response = await api.delete(`/admin/menus/${id}`);
+    return response.data;
+  },
+
+  // 法律文档管理
+  getLegalDocuments: async (params?: { page?: number; page_size?: number; type?: string; is_active?: string }) => {
+    const response = await api.get('/admin/legal-documents', { params });
+    return response.data;
+  },
+  getLegalDocument: async (id: string) => {
+    const response = await api.get(`/admin/legal-documents/${id}`);
+    return response.data;
+  },
+  createLegalDocument: async (data: any) => {
+    const response = await api.post('/admin/legal-documents', data);
+    return response.data;
+  },
+  updateLegalDocument: async (id: string, data: any) => {
+    const response = await api.put(`/admin/legal-documents/${id}`, data);
+    return response.data;
+  },
+  deleteLegalDocument: async (id: string) => {
+    const response = await api.delete(`/admin/legal-documents/${id}`);
+    return response.data;
+  },
+
+  // App 设置管理
+  getAppSettings: async () => {
+    const response = await api.get('/admin/app-settings');
+    return response.data;
+  },
+  createAppSetting: async (data: any) => {
+    const response = await api.post('/admin/app-settings', data);
+    return response.data;
+  },
+  updateAppSetting: async (id: string, data: any) => {
+    const response = await api.put(`/admin/app-settings/${id}`, data);
+    return response.data;
+  },
+  deleteAppSetting: async (id: string) => {
+    const response = await api.delete(`/admin/app-settings/${id}`);
+    return response.data;
+  },
+
+  // 评论管理
+  getComments: async (params: { page?: number; page_size?: number; keyword?: string; post_id?: string; user_id?: string }) => {
+    const response = await api.get('/admin/comments', { params });
+    return response.data;
+  },
+  getComment: async (id: string) => {
+    const response = await api.get(`/admin/comments/${id}`);
+    return response.data;
+  },
+  updateComment: async (id: string, data: any) => {
+    const response = await api.put(`/admin/comments/${id}`, data);
+    return response.data;
+  },
+  deleteCommentsBatch: async (ids: string[]) => {
+    const response = await api.post('/admin/comments/delete-batch', { ids });
+    return response.data;
+  },
+
+  // 版本管理
+  getVersions: async (params?: { page?: number; page_size?: number; platform?: string; is_active?: boolean }) => {
+    const response = await api.get('/admin/versions', { params });
+    return response.data;
+  },
+  getVersion: async (id: string) => {
+    const response = await api.get(`/admin/versions/${id}`);
+    return response.data;
+  },
+  createVersion: async (data: any) => {
+    const response = await api.post('/admin/versions', data);
+    return response.data;
+  },
+  updateVersion: async (id: string, data: any) => {
+    const response = await api.put(`/admin/versions/${id}`, data);
+    return response.data;
+  },
+  deleteVersion: async (id: string) => {
+    const response = await api.delete(`/admin/versions/${id}`);
+    return response.data;
+  },
+  // 更新日志管理
+  getUpdateLogs: async (params?: { page?: number; page_size?: number; version_id?: string }) => {
+    const response = await api.get('/admin/update-logs', { params });
+    return response.data;
+  },
+  createUpdateLog: async (data: any) => {
+    const response = await api.post('/admin/update-logs', data);
+    return response.data;
+  },
+  updateUpdateLog: async (id: string, data: any) => {
+    const response = await api.put(`/admin/update-logs/${id}`, data);
+    return response.data;
+  },
+  deleteUpdateLog: async (id: string) => {
+    const response = await api.delete(`/admin/update-logs/${id}`);
+    return response.data;
+  },
+
+  // 公告管理
+  getAnnouncements: async (params?: { page?: number; page_size?: number; type?: string; is_active?: string }) => {
+    const response = await api.get('/admin/announcements', { params });
+    return response.data;
+  },
+  getAnnouncement: async (id: string) => {
+    const response = await api.get(`/admin/announcements/${id}`);
+    return response.data;
+  },
+  createAnnouncement: async (data: any) => {
+    const response = await api.post('/admin/announcements', data);
+    return response.data;
+  },
+  updateAnnouncement: async (id: string, data: any) => {
+    const response = await api.put(`/admin/announcements/${id}`, data);
+    return response.data;
+  },
+  deleteAnnouncement: async (id: string) => {
+    const response = await api.delete(`/admin/announcements/${id}`);
+    return response.data;
+  },
+
+  // 功能引导管理
+  getFeatureGuides: async (params?: { page?: number; page_size?: number; platform?: string; is_active?: string }) => {
+    const response = await api.get('/admin/feature-guides', { params });
+    return response.data;
+  },
+  getFeatureGuide: async (id: string) => {
+    const response = await api.get(`/admin/feature-guides/${id}`);
+    return response.data;
+  },
+  createFeatureGuide: async (data: any) => {
+    const response = await api.post('/admin/feature-guides', data);
+    return response.data;
+  },
+  updateFeatureGuide: async (id: string, data: any) => {
+    const response = await api.put(`/admin/feature-guides/${id}`, data);
+    return response.data;
+  },
+  deleteFeatureGuide: async (id: string) => {
+    const response = await api.delete(`/admin/feature-guides/${id}`);
+    return response.data;
+  },
+
+  // 通知管理
+  getNotifications: async (params: { 
+    page?: number; 
+    page_size?: number; 
+    keyword?: string; 
+    type?: string;
+    user_id?: string;
+    is_read?: string;
+  }) => {
+    const response = await api.get('/admin/notifications', { params });
+    return response.data;
+  },
+  getNotification: async (id: string) => {
+    const response = await api.get(`/admin/notifications/${id}`);
+    return response.data;
+  },
+  getNotificationStats: async () => {
+    const response = await api.get('/admin/notifications/stats');
+    return response.data;
+  },
+  deleteNotification: async (id: string) => {
+    const response = await api.delete(`/admin/notifications/${id}`);
+    return response.data;
+  },
+  deleteNotificationsBatch: async (ids: string[]) => {
+    const response = await api.post('/admin/notifications/delete-batch', { ids });
     return response.data;
   },
 };

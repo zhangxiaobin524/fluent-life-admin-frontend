@@ -37,6 +37,19 @@ export interface Post {
   user?: User;
 }
 
+// 通知类型
+export interface Notification {
+  id: string;
+  user_id: string;
+  type: 'comment' | 'like' | 'follow' | 'practice_reminder' | 'achievement' | 'mention';
+  title: string;
+  content: string;
+  related_id?: string;
+  is_read: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // 房间类型
 export interface Room {
   id: string;

@@ -178,8 +178,8 @@ const AIRoles: React.FC = () => {
       render: (_: any, item: AIRole) => (
         <div className="flex gap-2 justify-center">
           <Button
-            variant="ghost"
-            size="sm"
+            variant="default"
+            size="small"
             onClick={() => handleEdit(item)}
             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
             title="编辑"
@@ -187,8 +187,8 @@ const AIRoles: React.FC = () => {
             <Edit className="w-4 h-4" />
           </Button>
           <Button
-            variant="ghost"
-            size="sm"
+            variant="default"
+            size="small"
             onClick={() => handleDelete(item.id)}
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
             title="删除"
@@ -205,7 +205,7 @@ const AIRoles: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">AI模拟角色</h1>
         <div className="flex gap-3">
-          <Button onClick={handleInitFromConfig} variant="ghost" className="flex items-center gap-2">
+          <Button onClick={handleInitFromConfig} variant="default" className="flex items-center gap-2">
             从配置文件初始化
           </Button>
           <Button onClick={handleCreate} className="flex items-center gap-2">

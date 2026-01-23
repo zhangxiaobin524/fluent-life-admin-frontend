@@ -179,7 +179,7 @@ const SpeechTechniques: React.FC = () => {
             <Button
               onClick={() => handleDelete(selectedIds)}
               variant="danger"
-              size="sm"
+              size="small"
             >
               批量删除
             </Button>

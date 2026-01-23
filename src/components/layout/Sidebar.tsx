@@ -24,6 +24,8 @@ import {
   Video,
   List,
   Wrench,
+  Music,
+  Bell,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useMenuContext } from '../../contexts/MenuContext';
@@ -140,6 +142,12 @@ const defaultMenuItems: MenuItem[] = [
         icon: MessageSquare,
         path: '/speech-techniques',
       },
+      {
+        key: 'meditation-assets',
+        label: '冥想资源管理',
+        icon: Music,
+        path: '/meditation-assets',
+      },
     ],
   },
   {
@@ -171,6 +179,12 @@ const defaultMenuItems: MenuItem[] = [
         label: '关注/收藏',
         icon: UserPlus,
         path: '/follows-collections',
+      },
+      {
+        key: 'notifications',
+        label: '通知管理',
+        icon: Bell,
+        path: '/notifications',
       },
     ],
   },
@@ -223,6 +237,30 @@ const defaultMenuItems: MenuItem[] = [
         label: '帮助文章',
         icon: MessageSquare,
         path: '/help-articles',
+      },
+      {
+        key: 'announcements',
+        label: '公告管理',
+        icon: MessageSquare,
+        path: '/announcements',
+      },
+      {
+        key: 'feature-guides',
+        label: '功能引导',
+        icon: BookOpen,
+        path: '/feature-guides',
+      },
+      {
+        key: 'versions',
+        label: '版本管理',
+        icon: FileText,
+        path: '/versions',
+      },
+      {
+        key: 'feedback',
+        label: '用户反馈',
+        icon: MessageCircle,
+        path: '/feedback',
       },
     ],
   },

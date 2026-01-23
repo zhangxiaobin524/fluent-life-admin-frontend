@@ -1,0 +1,99 @@
+name: CD - Deploy Admin Frontend to Server
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: 'Admin API Base URL'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Build admin frontend
+      env:
+        VITE_API_BASE_URL: ${{ inputs.api_url || secrets.VITE_ADMIN_API_BASE_URL || 'http://120.55.250.184:8082' }}
+      run: |
+        npm config set registry https://registry.npmmirror.com
+        npm ci
+        npm run build
+        
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+    - name: Add server to known hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+        
+    - name: Deploy to server
+      env:
+        VITE_API_BASE_URL: ${{ inputs.api_url || secrets.VITE_ADMIN_API_BASE_URL || 'http://120.55.250.184:8082' }}
+      run: |
+        # 創建部署目錄
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          mkdir -p /opt/fluent-life/fluent-life-admin-frontend
+        EOF
+        
+        # 同步構建產物到服務器
+        rsync -avz --delete \
+          dist/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/fluent-life/fluent-life-admin-frontend/dist/
+        
+        # 同步其他必要文件
+        rsync -avz \
+          --exclude 'node_modules' \
+          --exclude '.git' \
+          package.json \
+          ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/fluent-life/fluent-life-admin-frontend/ || true
+        
+        # 在服務器上部署：本倉庫自帶 Dockerfile，直接 build/run（不依賴其他 repo）
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+          set -e
+          cd /opt/fluent-life/fluent-life-admin-frontend
+
+          docker build --build-arg VITE_API_BASE_URL=${VITE_API_BASE_URL} -t fluent-life-admin-frontend:latest .
+
+          docker stop fluent-life-admin-frontend || true
+          docker rm fluent-life-admin-frontend || true
+          docker run -d \\
+            --name fluent-life-admin-frontend \\
+            --restart unless-stopped \\
+            -p 5172:5172 \\
+            fluent-life-admin-frontend:latest
+
+          sleep 5
+
+          for i in {1..20}; do
+            if curl -f http://localhost:5172 > /dev/null 2>&1; then
+              echo "✅ 管理前端服務健康檢查通過"
+              exit 0
+            fi
+            echo "等待服務啟動... (\$i/20)"
+            sleep 2
+          done
+
+          echo "❌ 服務健康檢查失敗"
+          docker logs fluent-life-admin-frontend
+          exit 1
+        EOF
+        
+    - name: Deployment status
+      run: |
+        echo "✅ 管理前端部署完成！"
+        echo "管理前端地址: http://${{ secrets.SERVER_HOST }}:5172"

@@ -139,7 +139,7 @@ const LegalDocumentModal: React.FC<Props> = ({ visible, editingItem, viewingItem
         </div>
 
         <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="default" onClick={onClose}>
             取消
           </Button>
           {!isViewMode && (

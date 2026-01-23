@@ -1,0 +1,41 @@
+name: CI - Build Admin Frontend
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        npm config set registry https://registry.npmmirror.com
+        npm ci
+        
+    - name: Build
+      env:
+        VITE_API_BASE_URL: ${{ secrets.VITE_ADMIN_API_BASE_URL || 'http://localhost:8082' }}
+      run: npm run build
+      
+    - name: Check build output
+      run: |
+        if [ -d "dist" ]; then
+          echo "✅ 構建成功，dist 目錄存在"
+          ls -la dist/
+        else
+          echo "❌ 構建失敗，dist 目錄不存在"
+          exit 1
+        fi

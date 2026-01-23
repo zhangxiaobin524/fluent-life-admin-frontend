@@ -180,7 +180,7 @@ const AIRoleModal: React.FC<Props> = ({ visible, editingItem, onClose }) => {
         </div>
 
         <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-          <Button variant="ghost" onClick={onClose} disabled={loading}>
+          <Button variant="default" onClick={onClose} disabled={loading}>
             取消
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>

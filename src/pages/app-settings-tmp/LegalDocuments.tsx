@@ -107,8 +107,8 @@ const LegalDocuments: React.FC = () => {
       render: (_: any, item: LegalDocument) => (
         <div className="flex gap-2">
           <Button
-            variant="ghost"
-            size="sm"
+            variant="default"
+            size="small"
             onClick={() => handleView(item)}
             className="text-blue-600 hover:text-blue-700"
           >
@@ -116,8 +116,8 @@ const LegalDocuments: React.FC = () => {
             查看
           </Button>
           <Button
-            variant="ghost"
-            size="sm"
+            variant="default"
+            size="small"
             onClick={() => handleEdit(item)}
             className="text-green-600 hover:text-green-700"
           >

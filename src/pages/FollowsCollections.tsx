@@ -362,8 +362,8 @@ const FollowsCollections: React.FC = () => {
 
         {/* 数据表格 */}
         <Table
-          columns={activeTab === 'follows' ? followColumns : collectionColumns}
-          dataSource={activeTab === 'follows' ? follows : collections}
+          columns={activeTab === 'follows' ? followColumns : (collectionColumns as any)}
+          dataSource={activeTab === 'follows' ? follows : (collections as any)}
           loading={loading}
           striped
           pagination={{

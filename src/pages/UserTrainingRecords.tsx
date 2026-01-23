@@ -493,7 +493,7 @@ const UserTrainingRecords: React.FC = () => {
                           dataKey="value"
                           label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                         >
-                          {trainingTypeData.map((entry, index) => (
+                          {trainingTypeData.map((_entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>

@@ -47,7 +47,7 @@ const CorrectionCenter: React.FC = () => {
       if (response.code === 0 && response.data) {
         const records = response.data.records || [];
         // 调试：检查用户信息是否正确加载
-        console.log('训练记录数据（前3条）:', records.slice(0, 3).map(r => ({
+        console.log('训练记录数据（前3条）:', records.slice(0, 3).map((r: any) => ({
           id: r.id,
           user_id: r.user_id,
           user: r.user,

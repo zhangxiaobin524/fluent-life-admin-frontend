@@ -87,14 +87,11 @@ const HelpArticleModal: React.FC<Props> = ({ visible, editingItem, categories, o
             <Select
               value={formData.category_id}
               onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-            >
-              <option value="">请选择分类</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </Select>
+              options={[
+                { label: '请选择分类', value: '' },
+                ...categories.map((cat) => ({ label: cat.name, value: cat.id }))
+              ]}
+            />
           </FormItem>
 
           <FormItem label="问题" required>
@@ -128,10 +125,11 @@ const HelpArticleModal: React.FC<Props> = ({ visible, editingItem, categories, o
               <Select
                 value={formData.is_active ? 'true' : 'false'}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'true' })}
-              >
-                <option value="true">启用</option>
-                <option value="false">禁用</option>
-              </Select>
+                options={[
+                  { label: '启用', value: 'true' },
+                  { label: '禁用', value: 'false' }
+                ]}
+              />
             </FormItem>
           </div>
         </div>

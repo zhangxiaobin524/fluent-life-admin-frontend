@@ -196,7 +196,7 @@ const ExposureModules: React.FC = () => {
       key: 'drag',
       title: '',
       width: '40px',
-      render: (_: any, record: ExposureModule) => (
+      render: (_: any, _record: ExposureModule) => (
         <div className="cursor-grab active:cursor-grabbing">
           <GripVertical className="text-gray-400" size={18} />
         </div>

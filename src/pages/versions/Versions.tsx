@@ -21,6 +21,8 @@ interface AppVersion {
   updated_at: string;
 }
 
+// UpdateLog 接口定義（UpdateLogModal 中使用）
+// @ts-ignore - 類型定義，用於 UpdateLogModal
 interface UpdateLog {
   id: string;
   version_id: string;

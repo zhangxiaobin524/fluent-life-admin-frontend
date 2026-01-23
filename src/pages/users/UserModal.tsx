@@ -47,7 +47,7 @@ const UserModal: React.FC<UserModalProps> = ({ visible, user, onClose }) => {
         email: user.email || '',
         phone: user.phone || '',
         role: user.role || 'user',
-        status: user.status, // 假设 user.status 已经是 0 或 1
+        status: user.status as 0 | 1, // user.status 是 number (0 | 1)
       });
     } else {
       reset({
@@ -60,7 +60,7 @@ const UserModal: React.FC<UserModalProps> = ({ visible, user, onClose }) => {
     }
   }, [user, reset]);
 
-  const onSubmit = async (data: UserFormData) => {
+  const onSubmit = async (data: UserFormData): Promise<void> => {
     // TODO: 调用 API 保存用户
     console.log('保存用户:', data);
     alert(user ? '用户更新成功' : '用户创建成功');

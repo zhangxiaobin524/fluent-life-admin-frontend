@@ -12,7 +12,7 @@ export const userSchema = z.object({
   email: z.union([z.string().email('请输入有效的邮箱地址'), z.literal('')]).optional(),
   phone: z.union([z.string().regex(/^1[3-9]\d{9}$/, '请输入有效的手机号'), z.literal('')]).optional(),
   role: z.string().min(1, '请选择角色'),
-  status: z.enum(['active', 'inactive']),
+  status: z.union([z.literal(0), z.literal(1)]), // 0-禁用, 1-正常
 });
 
 // 角色表单验证

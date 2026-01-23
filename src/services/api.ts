@@ -702,6 +702,24 @@ export const adminAPI = {
     const response = await api.post('/admin/notifications/delete-batch', { ids });
     return response.data;
   },
+
+  // 語音技巧管理（占位方法，待後端實現）
+  getSpeechTechniques: async (params?: { page?: number; page_size?: number }) => {
+    const response = await api.get('/admin/speech-techniques', { params });
+    return response.data;
+  },
+  createSpeechTechnique: async (data: any) => {
+    const response = await api.post('/admin/speech-techniques', data);
+    return response.data;
+  },
+  updateSpeechTechnique: async (id: string, data: any) => {
+    const response = await api.put(`/admin/speech-techniques/${id}`, data);
+    return response.data;
+  },
+  deleteSpeechTechniquesBatch: async (ids: string[]) => {
+    const response = await api.post('/admin/speech-techniques/delete-batch', { ids });
+    return response.data;
+  },
 };
 
 export default api;

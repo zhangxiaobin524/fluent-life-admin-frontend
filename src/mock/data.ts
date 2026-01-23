@@ -7,7 +7,7 @@ export const mockUsers: User[] = Array.from({ length: 50 }, (_, i) => ({
   email: `user${i + 1}@example.com`,
   phone: `138${String(i).padStart(8, '0')}`,
   role: i % 3 === 0 ? 'admin' : i % 3 === 1 ? 'editor' : 'user',
-  status: i % 5 === 0 ? 'inactive' : 'active',
+  status: i % 5 === 0 ? 0 : 1, // 0-禁用, 1-正常
   created_at: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
   last_login_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
 }));
@@ -45,6 +45,7 @@ export const mockTrainingRecords: TrainingRecord[] = Array.from({ length: 100 },
   type: ['meditation', 'airflow', 'exposure', 'practice'][i % 4],
   duration: Math.floor(Math.random() * 60 + 5) * 60,
   timestamp: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+  created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
   user: mockUsers[i % 20],
 }));
 

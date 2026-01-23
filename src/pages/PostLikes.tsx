@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminAPI } from '../services/api';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
-import { Heart, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface PostLike {

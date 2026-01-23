@@ -495,7 +495,7 @@ const Permission: React.FC = () => {
                         <tr className={loading ? 'opacity-50' : ''}>
                           {menuColumns.map((col) => (
                             <td key={col.key} className="px-6 py-4 whitespace-nowrap text-sm">
-                              {col.render ? col.render(null, menu) : (menu as any)[col.dataIndex as string]}
+                              {col.render ? col.render(null, menu, 0) : (menu as any)[col.dataIndex as string]}
                             </td>
                           ))}
                         </tr>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { adminAPI } from '../../services/api';
-import Card from '../../components/common/Card';
+// import Card from '../../components/common/Card'; // 未使用
 import Table, { Column } from '../../components/common/Table';
 import Button from '../../components/form/Button';
 import { Plus, Edit, Trash2 } from 'lucide-react';

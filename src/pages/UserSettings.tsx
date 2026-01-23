@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Tag, Modal, Form, Input, Select, Switch, message, Space, Popconfirm } from 'antd';
-import { EditOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons';
+import { EditOutlined, ReloadOutlined } from '@ant-design/icons';
 import { adminAPI } from '../services/api';
 
 const { Option } = Select;

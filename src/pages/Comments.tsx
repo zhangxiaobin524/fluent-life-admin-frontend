@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminAPI } from '../services/api';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
-import { MessageSquare, Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Comment {

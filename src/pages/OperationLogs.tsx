@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminAPI } from '../services/api';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
-import { FileText, Eye } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface OperationLog {

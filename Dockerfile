@@ -36,7 +36,7 @@ RUN echo 'server { \
     } \
     \
     location /api { \
-        proxy_pass http://admin-api:8082; \
+        proxy_pass http://fluent-life-admin-api:8082; \
         proxy_http_version 1.1; \
         proxy_set_header Upgrade $http_upgrade; \
         proxy_set_header Connection "upgrade"; \

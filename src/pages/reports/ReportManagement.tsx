@@ -67,8 +67,10 @@ const ReportManagement: React.FC = () => {
 
   const handleReview = (report: Report) => {
     setReviewingReport(report);
+    // 重置表单，不设置status，让用户必须选择
+    form.resetFields();
     form.setFieldsValue({
-      status: report.status,
+      status: undefined, // 不设置默认值，强制用户选择
       admin_reply: report.admin_reply || '',
       action: ''
     });
@@ -79,11 +81,21 @@ const ReportManagement: React.FC = () => {
     if (!reviewingReport) return;
     
     try {
-      await adminAPI.updateReportStatus(reviewingReport.id, values);
-      message.success('審核完成');
-      setIsReviewModalVisible(false);
-      fetchReports();
+      console.log('🔍 提交审核数据:', { id: reviewingReport.id, values });
+      const response = await adminAPI.updateReportStatus(reviewingReport.id, values);
+      console.log('🔍 审核响应:', response);
+      if (response.code === 0) {
+        message.success('審核完成');
+        setIsReviewModalVisible(false);
+        // 延迟一下再刷新，确保数据库已更新
+        setTimeout(() => {
+          fetchReports();
+        }, 300);
+      } else {
+        message.error(response.message || '審核失敗');
+      }
     } catch (error: any) {
+      console.error('🔍 审核失败:', error);
       message.error(error.response?.data?.message || '審核失敗');
     }
   };

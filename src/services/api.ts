@@ -657,7 +657,7 @@ export const adminAPI = {
   },
 
   // 敏感詞管理
-  getSensitiveWords: async (params?: { page?: number; page_size?: number; is_active?: boolean }) => {
+  getSensitiveWords: async (params?: { page?: number; page_size?: number; is_active?: boolean; keyword?: string; q?: string }) => {
     const response = await api.get('/admin/sensitive-words', { params });
     return response.data;
   },

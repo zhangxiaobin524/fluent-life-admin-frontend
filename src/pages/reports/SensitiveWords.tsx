@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Tag, Modal, Form, Input, Select, message, Space, Popconfirm } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { adminAPI } from '../../services/api';
 
 const { Option } = Select;
+const { Search } = Input;
 
 interface SensitiveWord {
   id: string;
@@ -20,23 +21,46 @@ const SensitiveWords: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<SensitiveWord | null>(null);
   const [form] = Form.useForm();
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 20,
+    total: 0,
+  });
 
-  const fetchWords = async () => {
+  const fetchWords = async (page = 1, pageSize = 20, keyword = '') => {
     setLoading(true);
     try {
-      const response = await adminAPI.getSensitiveWords({});
+      const params: any = {
+        page,
+        page_size: pageSize,
+      };
+      if (keyword && keyword.trim()) {
+        params.keyword = keyword.trim();
+      }
+      console.log('🔍 搜索敏感词，参数:', params);
+      const response = await adminAPI.getSensitiveWords(params);
+      console.log('🔍 搜索结果:', response);
       if (response.code === 0 && response.data) {
         setWords(response.data.words || []);
+        setPagination({
+          current: page,
+          pageSize: pageSize,
+          total: response.data.total || 0,
+        });
+      } else {
+        message.error(response.message || '獲取敏感詞列表失敗');
       }
-    } catch (error) {
-      message.error('獲取敏感詞列表失敗');
+    } catch (error: any) {
+      console.error('🔍 搜索失败:', error);
+      message.error(error?.response?.data?.message || '獲取敏感詞列表失敗');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchWords();
+    fetchWords(1, pagination.pageSize, '');
   }, []);
 
   const handleAdd = () => {
@@ -69,7 +93,7 @@ const SensitiveWords: React.FC = () => {
         message.success('創建成功');
       }
       setIsModalVisible(false);
-      fetchWords();
+      fetchWords(pagination.current, pagination.pageSize, searchKeyword);
     } catch (error: any) {
       message.error(error.response?.data?.message || '操作失敗');
     }
@@ -79,10 +103,25 @@ const SensitiveWords: React.FC = () => {
     try {
       await adminAPI.deleteSensitiveWord(id);
       message.success('刪除成功');
-      fetchWords();
+      fetchWords(pagination.current, pagination.pageSize, searchKeyword);
     } catch (error) {
       message.error('刪除失敗');
     }
+  };
+
+  const handleTableChange = (page: number, pageSize: number) => {
+    fetchWords(page, pageSize, searchKeyword);
+  };
+
+  const handleSearch = (value: string) => {
+    const keyword = value.trim();
+    console.log('🔍 handleSearch 被调用，关键词:', keyword);
+    setSearchKeyword(keyword);
+    // 重置分页到第一页并执行搜索
+    const currentPageSize = pagination.pageSize;
+    setPagination(prev => ({ ...prev, current: 1 }));
+    // 直接调用fetchWords进行搜索
+    fetchWords(1, currentPageSize, keyword);
   };
 
   const getLevelColor = (level: number) => {
@@ -174,12 +213,13 @@ const SensitiveWords: React.FC = () => {
               type="primary" 
               icon={<PlusOutlined />} 
               onClick={handleAdd}
+              style={{ backgroundColor: '#1890ff', borderColor: '#1890ff' }}
             >
               添加敏感詞
             </Button>
             <Button 
               icon={<ReloadOutlined />} 
-              onClick={fetchWords}
+              onClick={() => fetchWords(pagination.current, pagination.pageSize, searchKeyword)}
               loading={loading}
             >
               刷新
@@ -187,15 +227,40 @@ const SensitiveWords: React.FC = () => {
           </Space>
         }
       >
+        <div style={{ marginBottom: 16 }}>
+          <Search
+            placeholder="搜索敏感詞..."
+            allowClear
+            enterButton={<SearchOutlined />}
+            size="large"
+            value={searchKeyword}
+            onSearch={handleSearch}
+            onChange={(e) => {
+              const value = e.target.value;
+              // 更新输入框的值，但不立即搜索（等待用户点击搜索或按回车）
+              setSearchKeyword(value);
+              // 如果清空了，立即搜索
+              if (value === '') {
+                handleSearch('');
+              }
+            }}
+            style={{ maxWidth: 400 }}
+          />
+        </div>
         <Table
           dataSource={words}
           columns={columns}
           rowKey="id"
           loading={loading}
           pagination={{
-            pageSize: 20,
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
+            showTotal: (total) => `共 ${total} 条`,
+            onChange: handleTableChange,
+            onShowSizeChange: handleTableChange,
           }}
         />
       </Card>

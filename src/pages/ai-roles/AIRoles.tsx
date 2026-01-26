@@ -13,6 +13,7 @@ interface AIRole {
   system_prompt: string;
   voice_type: string;
   enabled: boolean;
+  is_premium?: boolean; // 是否为高级角色
 }
 
 const AIRoles: React.FC = () => {
@@ -155,6 +156,19 @@ const AIRoles: React.FC = () => {
             {item.voice_type || '-'}
           </span>
         </div>
+      ),
+    },
+    {
+      key: 'is_premium',
+      title: '高级角色',
+      width: '10%',
+      align: 'center' as const,
+      render: (_: any, item: AIRole) => (
+        <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap inline-block ${
+          item.is_premium ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
+        }`}>
+          {item.is_premium ? '⭐ 是（仅会员）' : '否（免费可用）'}
+        </span>
       ),
     },
     {

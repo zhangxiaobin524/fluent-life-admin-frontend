@@ -12,6 +12,7 @@ interface VoiceType {
   type: string;
   description: string;
   enabled: boolean;
+  is_premium?: boolean;
 }
 
 const VoiceTypes: React.FC = () => {
@@ -87,6 +88,18 @@ const VoiceTypes: React.FC = () => {
       title: '描述',
       dataIndex: 'description' as keyof VoiceType,
       render: (value: string) => value || <span className="text-gray-400">-</span>,
+    },
+    {
+      key: 'is_premium',
+      title: '会员专属',
+      dataIndex: 'is_premium' as keyof VoiceType,
+      render: (value: boolean) => (
+        <span className={`px-2 py-1 rounded text-xs font-medium ${
+          value ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+        }`}>
+          {value ? '是' : '否'}
+        </span>
+      ),
     },
     {
       key: 'enabled',

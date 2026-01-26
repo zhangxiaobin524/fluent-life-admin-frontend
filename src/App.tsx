@@ -36,6 +36,12 @@ import Versions from './pages/versions';
 import Notifications from './pages/Notifications';
 import ReportManagement from './pages/reports/ReportManagement';
 import SensitiveWords from './pages/reports/SensitiveWords';
+import SystemLogs from './pages/SystemLogs';
+import AIConversations from './pages/ai-conversations';
+import Admins from './pages/admins';
+import Files from './pages/files';
+import UserBehavior from './pages/user-behavior';
+import NotificationSend from './pages/notification-send';
 import Layout from './components/Layout';
 
 function App() {
@@ -468,6 +474,78 @@ function App() {
             isAuthenticated ? (
               <Layout onLogout={() => setIsAuthenticated(false)}>
                 <SensitiveWords />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/system-logs"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <SystemLogs />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/ai-conversations"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <AIConversations />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/admins"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <Admins />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/files"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <Files />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/user-behavior"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <UserBehavior />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/notification-send"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <NotificationSend />
               </Layout>
             ) : (
               <Navigate to="/login" replace />

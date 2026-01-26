@@ -66,7 +66,10 @@ const MeditationAssetModal: React.FC<Props> = ({ visible, editingItem, onClose }
       setFormData({
         ...editingItem,
         duration: editingItem.duration ?? undefined,
-        linked_audio_id: editingItem.linked_audio_id || null,
+        // 确保 linked_audio_id 正确初始化：null、undefined 或空字符串都转换为 null
+        linked_audio_id: editingItem.linked_audio_id && editingItem.linked_audio_id !== '' 
+          ? editingItem.linked_audio_id 
+          : null,
       });
       setSelectedFile(null);
     } else {
@@ -115,9 +118,9 @@ const MeditationAssetModal: React.FC<Props> = ({ visible, editingItem, onClose }
         is_active: formData.is_active,
       };
 
-      // 如果是图片类型，添加关联的音频ID
-      if (formData.asset_type === 'image' && formData.linked_audio_id) {
-        payload.linked_audio_id = formData.linked_audio_id;
+      // 如果是图片类型，添加关联的音频ID（包括 null，用于清除关联）
+      if (formData.asset_type === 'image') {
+        payload.linked_audio_id = formData.linked_audio_id || null;
       }
 
       // 如果是音频类型，添加时长
@@ -136,6 +139,9 @@ const MeditationAssetModal: React.FC<Props> = ({ visible, editingItem, onClose }
         payload.url = formData.url.trim();
       }
 
+      // 调试：打印发送的数据
+      console.log('提交的数据:', JSON.stringify(payload, null, 2));
+      
       if (editingItem?.id) {
         await adminAPI.updateMeditationAsset(editingItem.id, payload);
       } else {
@@ -226,7 +232,13 @@ const MeditationAssetModal: React.FC<Props> = ({ visible, editingItem, onClose }
               ) : (
                 <select
                   value={formData.linked_audio_id || ''}
-                  onChange={(e) => setFormData({ ...formData, linked_audio_id: e.target.value || null })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData({ 
+                      ...formData, 
+                      linked_audio_id: value === '' ? null : value 
+                    });
+                  }}
                   className="w-full px-3 py-2 border rounded-lg"
                 >
                   <option value="">无（不关联）</option>

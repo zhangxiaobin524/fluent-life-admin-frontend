@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { userSchema } from '../../utils/validation';
 import { User } from '../../types/index';
+import { adminAPI } from '../../services/api';
 import FormItem from '../../components/form/FormItem';
 import Input from '../../components/form/Input';
 import Select from '../../components/form/Select';
@@ -24,6 +25,7 @@ interface UserFormData {
 }
 
 const UserModal: React.FC<UserModalProps> = ({ visible, user, onClose }) => {
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -61,10 +63,51 @@ const UserModal: React.FC<UserModalProps> = ({ visible, user, onClose }) => {
   }, [user, reset]);
 
   const onSubmit = async (data: UserFormData): Promise<void> => {
-    // TODO: 调用 API 保存用户
-    console.log('保存用户:', data);
-    alert(user ? '用户更新成功' : '用户创建成功');
-    onClose();
+    setLoading(true);
+    try {
+      if (user?.id) {
+        // 更新用户
+        const updateData: any = {
+          username: data.username,
+          email: data.email || undefined,
+          phone: data.phone || undefined,
+          role: data.role,
+          status: data.status,
+        };
+        const response = await adminAPI.updateUser(user.id, updateData);
+        if (response.code === 0) {
+          alert('用户更新成功');
+          onClose();
+        } else {
+          alert(response.message || '更新失败');
+        }
+      } else {
+        // 创建用户
+        if (!data.username) {
+          alert('请输入用户名');
+          return;
+        }
+        const response = await adminAPI.createUser({
+          username: data.username,
+          email: data.email,
+          phone: data.phone,
+          password: '123456', // 默认密码，创建后应提醒用户修改
+          role: data.role,
+          status: data.status,
+        });
+        if (response.code === 0) {
+          alert('用户创建成功！默认密码：123456，请提醒用户修改密码');
+          onClose();
+        } else {
+          alert(response.message || '创建失败');
+        }
+      }
+    } catch (error: any) {
+      console.error('保存用户失败:', error);
+      alert(error.response?.data?.message || '保存失败，请重试');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!visible) return null;
@@ -117,6 +160,7 @@ const UserModal: React.FC<UserModalProps> = ({ visible, user, onClose }) => {
                 { label: '普通用户', value: 'user' },
                 { label: '编辑', value: 'editor' },
                 { label: '管理员', value: 'admin' },
+                { label: '超级管理员', value: 'super_admin' },
               ]}
               error={!!errors.role}
             />
@@ -134,11 +178,11 @@ const UserModal: React.FC<UserModalProps> = ({ visible, user, onClose }) => {
           </FormItem>
 
           <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
-            <Button variant="default" onClick={onClose}>
+            <Button variant="default" onClick={onClose} disabled={loading}>
               取消
             </Button>
-            <Button type="submit" variant="primary">
-              确定
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? '保存中...' : '确定'}
             </Button>
           </div>
         </form>

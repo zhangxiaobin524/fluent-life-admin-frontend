@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { captureException } from '../utils/monitoring';
 
 const API_BASE_URL = 'http://localhost:8082/api/v1';
 
@@ -28,6 +29,42 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// 響應攔截器：處理錯誤和 Token 刷新
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error: AxiosError<any>) => {
+    // 記錄詳細的錯誤信息
+    console.error('API 請求失敗:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message,
+    });
+
+    // 發送到 Sentry（僅非 401 錯誤，401 是正常的認證失敗）
+    if (error.response?.status !== 401) {
+      captureException(new Error(`API Error: ${error.message}`), {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+      });
+    }
+    
+    if (error.response?.status === 401) {
+      // Token 過期，清除本地存儲並跳轉到登錄
+      localStorage.removeItem('admin_token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 // 管理员API
 export const adminAPI = {
   login: async (username: string, password: string) => {
@@ -45,6 +82,14 @@ export const adminAPI = {
   },
   getUser: async (id: string) => {
     const response = await api.get(`/admin/users/${id}`);
+    return response.data;
+  },
+  createUser: async (data: { username: string; email?: string; phone?: string; password: string; role?: string; status?: number }) => {
+    const response = await api.post('/admin/users', data);
+    return response.data;
+  },
+  updateUser: async (id: string, data: { username?: string; email?: string; phone?: string; password?: string; role?: string; status?: number }) => {
+    const response = await api.put(`/admin/users/${id}`, data);
     return response.data;
   },
   deleteUser: async (id: string) => {
@@ -500,6 +545,10 @@ export const adminAPI = {
     const response = await api.delete(`/admin/menus/${id}`);
     return response.data;
   },
+  updateMenusSort: async (updates: Array<{ id: string; sort: number }>) => {
+    const response = await api.put('/admin/menus/batch-sort', { updates });
+    return response.data;
+  },
 
   // 法律文档管理
   getLegalDocuments: async (params?: { page?: number; page_size?: number; type?: string; is_active?: string }) => {
@@ -718,6 +767,93 @@ export const adminAPI = {
   },
   deleteSpeechTechniquesBatch: async (ids: string[]) => {
     const response = await api.post('/admin/speech-techniques/delete-batch', { ids });
+    return response.data;
+  },
+
+  // 系统日志管理
+  getLogs: async () => {
+    const response = await api.get('/admin/logs');
+    return response.data;
+  },
+  getLogContent: async (filename: string, params?: { lines?: number; tail?: boolean }) => {
+    const queryParams: any = {};
+    if (params?.lines) queryParams.lines = params.lines.toString();
+    if (params?.tail !== undefined) queryParams.tail = params.tail.toString();
+    const response = await api.get(`/admin/logs/${filename}`, { params: queryParams });
+    return response.data;
+  },
+  searchLogs: async (params: { keyword: string; type?: string; limit?: number }) => {
+    const response = await api.get('/admin/logs/search', { params });
+    return response.data;
+  },
+  getLogStats: async () => {
+    const response = await api.get('/admin/logs/stats');
+    return response.data;
+  },
+
+  // AI对话管理
+  getAIConversations: async (params?: { page?: number; page_size?: number; user_id?: string }) => {
+    const response = await api.get('/admin/ai-conversations', { params });
+    return response.data;
+  },
+  getAIConversation: async (id: string) => {
+    const response = await api.get(`/admin/ai-conversations/${id}`);
+    return response.data;
+  },
+  deleteAIConversationsBatch: async (ids: string[]) => {
+    const response = await api.post('/admin/ai-conversations/delete-batch', { ids });
+    return response.data;
+  },
+
+  // 文件管理
+  getFiles: async () => {
+    const response = await api.get('/admin/files');
+    return response.data;
+  },
+  getFileStats: async () => {
+    const response = await api.get('/admin/files/stats');
+    return response.data;
+  },
+
+  // 用户行为分析
+  getUserBehaviorStats: async () => {
+    const response = await api.get('/admin/user-behavior/stats');
+    return response.data;
+  },
+  getUserActivityTrend: async (params?: { days?: number }) => {
+    const response = await api.get('/admin/user-behavior/activity-trend', { params });
+    return response.data;
+  },
+  getUserFunctionUsage: async () => {
+    const response = await api.get('/admin/user-behavior/function-usage');
+    return response.data;
+  },
+
+  // 通知发送管理
+  sendNotification: async (data: { user_ids: string[]; type: string; title: string; content?: string; related_id?: string }) => {
+    const response = await api.post('/admin/notifications/send', data);
+    return response.data;
+  },
+  getNotificationSendHistory: async (params?: { page?: number; page_size?: number }) => {
+    const response = await api.get('/admin/notifications/send-history', { params });
+    return response.data;
+  },
+
+  // 支付配置管理
+  getPaymentConfig: async () => {
+    const response = await api.get('/admin/payment-config');
+    return response.data;
+  },
+  createOrUpdatePaymentConfig: async (data: any) => {
+    const response = await api.post('/admin/payment-config', data);
+    return response.data;
+  },
+  updatePaymentConfig: async (id: string, data: any) => {
+    const response = await api.put(`/admin/payment-config/${id}`, data);
+    return response.data;
+  },
+  testPaymentConfig: async (type: 'alipay' | 'wechat') => {
+    const response = await api.post('/admin/payment-config/test', { type });
     return response.data;
   },
 };

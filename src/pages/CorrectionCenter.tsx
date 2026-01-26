@@ -3,7 +3,7 @@ import { adminAPI } from '../services/api';
 import { TrainingRecord } from '../types/index';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
-import { Activity, TrendingUp, Clock, Edit, Trash2, Eye } from 'lucide-react';
+import { Activity, TrendingUp, Clock, Edit, Trash2, Eye, Download, Upload } from 'lucide-react';
 import { format } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
@@ -184,6 +184,40 @@ const CorrectionCenter: React.FC = () => {
       console.error('更新失败:', error);
       alert('更新失败');
     }
+  };
+
+  const handleExportData = () => {
+    // 导出当前筛选条件下的所有数据
+    const exportData = {
+      export_time: new Date().toISOString(),
+      filter: {
+        type: filterType || '全部',
+      },
+      stats: stats,
+      records: records.map(record => ({
+        id: record.id,
+        user_id: record.user_id,
+        username: record.user?.username || record.username || '未知用户',
+        type: record.type,
+        type_name: getTypeName(record.type),
+        duration: record.duration,
+        duration_formatted: `${Math.floor(record.duration / 60)} 分钟 ${record.duration % 60} 秒`,
+        timestamp: record.timestamp,
+        created_at: record.created_at,
+        data: record.data,
+      })),
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const dateStr = new Date().toISOString().split('T')[0];
+    a.download = `训练记录_${filterType || '全部'}_${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const columns = [
@@ -406,7 +440,7 @@ const CorrectionCenter: React.FC = () => {
 
       {/* 数据表格 */}
       <Card shadow>
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between gap-2">
           <select
             value={filterType}
             onChange={(e) => {
@@ -421,14 +455,23 @@ const CorrectionCenter: React.FC = () => {
             <option value="exposure">社会脱敏</option>
             <option value="practice">AI实战</option>
           </select>
-          {selectedRecords.length > 0 && (
+          <div className="flex gap-2">
             <button
-              onClick={() => handleDelete(selectedRecords)}
-              className="px-4 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+              onClick={handleExportData}
+              className="px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 flex items-center gap-2"
             >
-              批量删除 ({selectedRecords.length})
+              <Download className="w-4 h-4" />
+              导出数据
             </button>
-          )}
+            {selectedRecords.length > 0 && (
+              <button
+                onClick={() => handleDelete(selectedRecords)}
+                className="px-4 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+              >
+                批量删除 ({selectedRecords.length})
+              </button>
+            )}
+          </div>
         </div>
         <Table
           columns={columns}
@@ -506,34 +549,70 @@ const CorrectionCenter: React.FC = () => {
       {/* 详情模态框 */}
       {showDetailModal && detailRecord && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-4">训练记录详情</h2>
-            <div className="space-y-3">
-              <div>
-                <span className="text-sm font-medium text-gray-700">训练类型：</span>
-                <span className="text-sm text-gray-900 ml-2">{getTypeName(detailRecord.type)}</span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-700">用户：</span>
-                <span className="text-sm text-gray-900 ml-2">{detailRecord.user?.username || detailRecord.username || '未知用户'}</span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-700">训练时长：</span>
-                <span className="text-sm text-gray-900 ml-2">{Math.floor(detailRecord.duration / 60)} 分钟</span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-700">训练时间：</span>
-                <span className="text-sm text-gray-900 ml-2">{format(new Date(detailRecord.timestamp), 'yyyy-MM-dd HH:mm:ss')}</span>
-              </div>
-              {detailRecord.data && Object.keys(detailRecord.data).length > 0 && (
-                <div>
-                  <span className="text-sm font-medium text-gray-700">训练数据：</span>
-                  <pre className="text-sm text-gray-900 mt-2 bg-gray-50 p-3 rounded overflow-auto">
-                    {JSON.stringify(detailRecord.data, null, 2)}
-                  </pre>
-                </div>
-              )}
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">训练记录详情</h2>
+              <button
+                onClick={() => {
+                  setShowDetailModal(false);
+                  setDetailRecord(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
             </div>
+            
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-gray-50 p-4 rounded">
+                <div className="text-xs text-gray-500 mb-1">训练类型</div>
+                <div className="text-sm font-medium text-gray-900">{getTypeName(detailRecord.type)}</div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded">
+                <div className="text-xs text-gray-500 mb-1">用户</div>
+                <div className="text-sm font-medium text-gray-900">{detailRecord.user?.username || detailRecord.username || '未知用户'}</div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded">
+                <div className="text-xs text-gray-500 mb-1">训练时长</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {Math.floor(detailRecord.duration / 60)} 分钟 {detailRecord.duration % 60} 秒
+                </div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded">
+                <div className="text-xs text-gray-500 mb-1">训练时间</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {format(new Date(detailRecord.timestamp), 'yyyy-MM-dd HH:mm:ss')}
+                </div>
+              </div>
+            </div>
+
+            {detailRecord.data && Object.keys(detailRecord.data).length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">训练详细信息</h3>
+                <div className="bg-gray-50 p-4 rounded space-y-2">
+                  {Object.entries(detailRecord.data).map(([key, value]) => (
+                    <div key={key} className="flex items-start">
+                      <span className="text-xs font-medium text-gray-600 w-32 flex-shrink-0 capitalize">
+                        {key.replace(/_/g, ' ')}:
+                      </span>
+                      <span className="text-sm text-gray-900 flex-1">
+                        {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {detailRecord.data && Object.keys(detailRecord.data).length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">原始JSON数据</h3>
+                <pre className="text-xs text-gray-900 bg-gray-50 p-3 rounded overflow-auto max-h-64">
+                  {JSON.stringify(detailRecord.data, null, 2)}
+                </pre>
+              </div>
+            )}
+
             <div className="mt-6 flex justify-end">
               <button
                 onClick={() => {

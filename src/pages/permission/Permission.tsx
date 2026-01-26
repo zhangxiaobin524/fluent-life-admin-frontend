@@ -7,7 +7,7 @@ import Input from '../../components/form/Input';
 import FormItem from '../../components/form/FormItem';
 import Textarea from '../../components/form/Textarea';
 import { Role, Menu } from '../../types/index';
-import { Plus, Edit, Trash2, Shield, List, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Shield, List, X, GripVertical } from 'lucide-react';
 import { format } from 'date-fns';
 import { Column } from '../../components/common/Table';
 
@@ -21,6 +21,16 @@ const Permission: React.FC = () => {
   const [menuPage, setMenuPage] = useState(1);
   const [menuTotal, setMenuTotal] = useState(0);
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
+  const [draggedMenu, setDraggedMenu] = useState<{
+    level: 'root' | 'child';
+    parentId?: string;
+    index: number;
+  } | null>(null);
+  const [dragOverMenu, setDragOverMenu] = useState<{
+    level: 'root' | 'child';
+    parentId?: string;
+    index: number;
+  } | null>(null);
 
   // 角色相关状态
   const [showRoleModal, setShowRoleModal] = useState(false);
@@ -98,6 +108,84 @@ const Permission: React.FC = () => {
       }
       return newSet;
     });
+  };
+
+  const buildSortUpdates = (list: Menu[]) => list.map((m, idx) => ({ id: m.id, sort: idx }));
+
+  const handleMenuDragStart = (payload: { level: 'root' | 'child'; parentId?: string; index: number }) => {
+    setDraggedMenu(payload);
+  };
+
+  const handleMenuDragOver = (
+    e: React.DragEvent,
+    payload: { level: 'root' | 'child'; parentId?: string; index: number }
+  ) => {
+    e.preventDefault();
+    if (!draggedMenu) return;
+    // 只允许同层级、同父级内排序
+    if (draggedMenu.level !== payload.level) return;
+    if (draggedMenu.parentId !== payload.parentId) return;
+    if (draggedMenu.index === payload.index) return;
+    setDragOverMenu(payload);
+  };
+
+  const handleMenuDragLeave = () => {
+    setDragOverMenu(null);
+  };
+
+  const handleMenuDragEnd = () => {
+    setDraggedMenu(null);
+    setDragOverMenu(null);
+  };
+
+  const handleMenuDrop = async (payload: { level: 'root' | 'child'; parentId?: string; index: number }) => {
+    if (!draggedMenu) return;
+    if (draggedMenu.level !== payload.level) return;
+    if (draggedMenu.parentId !== payload.parentId) return;
+    if (draggedMenu.index === payload.index) return;
+
+    const prevMenus = menus;
+    try {
+      let updates: Array<{ id: string; sort: number }> = [];
+
+      if (payload.level === 'root') {
+        const next = [...menus];
+        const [moved] = next.splice(draggedMenu.index, 1);
+        next.splice(payload.index, 0, moved);
+        const nextWithSort = next.map((m, idx) => ({ ...m, sort: idx }));
+        setMenus(nextWithSort);
+        updates = buildSortUpdates(nextWithSort);
+      } else {
+        const parentId = payload.parentId!;
+        const parentIndex = menus.findIndex(m => m.id === parentId);
+        if (parentIndex === -1) return;
+
+        const parent = menus[parentIndex];
+        const children = parent.children ? [...parent.children] : [];
+        const [moved] = children.splice(draggedMenu.index, 1);
+        children.splice(payload.index, 0, moved);
+        const childrenWithSort = children.map((c, idx) => ({ ...c, sort: idx }));
+
+        const next = menus.map(m => (m.id === parentId ? { ...m, children: childrenWithSort } : m));
+        setMenus(next);
+        updates = buildSortUpdates(childrenWithSort);
+      }
+
+      const res = await adminAPI.updateMenusSort(updates);
+      if (res.code !== 0) {
+        throw new Error(res.message || '更新排序失败');
+      }
+
+      window.dispatchEvent(new CustomEvent('menuUpdated'));
+      await loadMenus();
+    } catch (error) {
+      console.error('拖拽排序保存失败:', error);
+      setMenus(prevMenus);
+      alert('排序保存失败，请重试');
+    } finally {
+      setDraggedMenu(null);
+      setDragOverMenu(null);
+    }
   };
 
   // 角色操作
@@ -319,6 +407,15 @@ const Permission: React.FC = () => {
 
   const menuColumns: Column<Menu>[] = [
     {
+      key: 'drag',
+      title: '',
+      render: () => (
+        <div className="text-gray-400 hover:text-gray-600 cursor-move flex items-center justify-center">
+          <GripVertical className="w-4 h-4" />
+        </div>
+      ),
+    },
+    {
       key: 'name',
       title: '菜单名称',
       render: (_: any, record: Menu) => {
@@ -490,9 +587,23 @@ const Permission: React.FC = () => {
                       </td>
                     </tr>
                   ) : (
-                    menus.map((menu) => (
+                    menus.map((menu, index) => (
                       <React.Fragment key={menu.id}>
-                        <tr className={loading ? 'opacity-50' : ''}>
+                        <tr
+                          className={[
+                            loading ? 'opacity-50' : '',
+                            dragOverMenu?.level === 'root' && dragOverMenu.index === index ? 'bg-blue-50' : '',
+                          ].join(' ')}
+                          draggable={!loading}
+                          onDragStart={(e) => {
+                            e.dataTransfer.effectAllowed = 'move';
+                            handleMenuDragStart({ level: 'root', index });
+                          }}
+                          onDragOver={(e) => handleMenuDragOver(e, { level: 'root', index })}
+                          onDragLeave={handleMenuDragLeave}
+                          onDrop={() => handleMenuDrop({ level: 'root', index })}
+                          onDragEnd={handleMenuDragEnd}
+                        >
                           {menuColumns.map((col) => (
                             <td key={col.key} className="px-6 py-4 whitespace-nowrap text-sm">
                               {col.render ? col.render(null, menu, 0) : (menu as any)[col.dataIndex as string]}
@@ -502,11 +613,34 @@ const Permission: React.FC = () => {
                         {/* 展开显示子菜单 */}
                         {expandedMenus.has(menu.id) && menu.children && menu.children.length > 0 && (
                           <>
-                            {menu.children.map((child) => (
-                              <tr key={child.id} className="bg-gray-50">
+                            {menu.children.map((child, childIndex) => (
+                              <tr
+                                key={child.id}
+                                className={[
+                                  'bg-gray-50',
+                                  dragOverMenu?.level === 'child' &&
+                                  dragOverMenu.parentId === menu.id &&
+                                  dragOverMenu.index === childIndex
+                                    ? 'bg-blue-50'
+                                    : '',
+                                ].join(' ')}
+                                draggable={!loading}
+                                onDragStart={(e) => {
+                                  e.dataTransfer.effectAllowed = 'move';
+                                  handleMenuDragStart({ level: 'child', parentId: menu.id, index: childIndex });
+                                }}
+                                onDragOver={(e) => handleMenuDragOver(e, { level: 'child', parentId: menu.id, index: childIndex })}
+                                onDragLeave={handleMenuDragLeave}
+                                onDrop={() => handleMenuDrop({ level: 'child', parentId: menu.id, index: childIndex })}
+                                onDragEnd={handleMenuDragEnd}
+                              >
                                 {menuColumns.map((col) => (
                                   <td key={col.key} className="px-6 py-4 whitespace-nowrap text-sm">
-                                    {col.key === 'name' ? (
+                                    {col.key === 'drag' ? (
+                                      <div className="pl-8 text-gray-400 hover:text-gray-600 cursor-move flex items-center justify-center">
+                                        <GripVertical className="w-4 h-4" />
+                                      </div>
+                                    ) : col.key === 'name' ? (
                                       <div className="flex items-center gap-2 pl-8">
                                         <span className="text-gray-400">└─</span>
                                         <span className="text-gray-700">{child.name}</span>

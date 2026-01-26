@@ -12,6 +12,7 @@ interface VoiceType {
   type: string;
   description: string;
   enabled: boolean;
+  is_premium?: boolean;
 }
 
 interface Props {
@@ -27,6 +28,7 @@ const VoiceTypeModal: React.FC<Props> = ({ visible, editingItem, onClose }) => {
     type: '',
     description: '',
     enabled: true,
+    is_premium: false,
   });
   const [loading, setLoading] = useState(false);
 
@@ -40,6 +42,7 @@ const VoiceTypeModal: React.FC<Props> = ({ visible, editingItem, onClose }) => {
         type: '',
         description: '',
         enabled: true,
+        is_premium: false,
       });
     }
   }, [editingItem, visible]);
@@ -118,6 +121,20 @@ const VoiceTypeModal: React.FC<Props> = ({ visible, editingItem, onClose }) => {
               ]}
             />
             <p className="text-xs text-gray-500 mt-1">只有启用的音色类型才能在AI角色配置中选择</p>
+          </FormItem>
+
+          <FormItem label="会员专属（高级音色）">
+            <Select
+              value={formData.is_premium ? 'true' : 'false'}
+              onChange={(e) => setFormData({ ...formData, is_premium: e.target.value === 'true' })}
+              options={[
+                { value: 'false', label: '否（基础音色）' },
+                { value: 'true', label: '是（会员专属）' },
+              ]}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              开启后，此音色将作为“高级音色”在App内触发会员限制与升级提示
+            </p>
           </FormItem>
         </div>
 

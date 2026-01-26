@@ -15,7 +15,7 @@ interface TableProps<T> {
   dataSource: T[];
   loading?: boolean;
   rowKey?: string | ((record: T) => string);
-  onRow?: (record: T) => React.HTMLAttributes<HTMLTableRowElement> & {
+  onRow?: (record: T, index: number) => React.HTMLAttributes<HTMLTableRowElement> & {
     draggable?: boolean;
     onDragStart?: (e: React.DragEvent) => void;
     onDragEnd?: (e: React.DragEvent) => void;
@@ -97,7 +97,7 @@ function Table<T extends Record<string, any>>({
             ) : (
               dataSource.map((record, index) => {
                 const key = getRowKey(record, index);
-                const rowProps = onRow ? onRow(record) : {};
+                const rowProps = onRow ? onRow(record, index) : {};
                 const { className: rowClassName, ...restRowProps } = rowProps;
                 return (
                   <tr

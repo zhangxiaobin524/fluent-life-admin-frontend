@@ -86,7 +86,27 @@ const defaultMenuItems: MenuItem[] = [
     key: 'users',
     label: '用户管理',
     icon: Users,
-    path: '/users',
+    group: true,
+    children: [
+      {
+        key: 'users-list',
+        label: '用户列表',
+        icon: Users,
+        path: '/users',
+      },
+      {
+        key: 'user-behavior',
+        label: '用户行为分析',
+        icon: BarChart3,
+        path: '/user-behavior',
+      },
+      {
+        key: 'admins',
+        label: '管理员管理',
+        icon: Users,
+        path: '/admins',
+      },
+    ],
   },
   {
     key: 'correction',
@@ -111,6 +131,12 @@ const defaultMenuItems: MenuItem[] = [
         label: 'AI模拟角色',
         icon: Users,
         path: '/ai-roles',
+      },
+      {
+        key: 'ai-conversations',
+        label: 'AI对话管理',
+        icon: MessageSquare,
+        path: '/ai-conversations',
       },
       {
         key: 'voice-types',
@@ -295,6 +321,24 @@ const defaultMenuItems: MenuItem[] = [
         path: '/operation-logs',
       },
       {
+        key: 'system-logs',
+        label: '系统日志',
+        icon: FileText,
+        path: '/system-logs',
+      },
+      {
+        key: 'files',
+        label: '文件管理',
+        icon: FileText,
+        path: '/files',
+      },
+      {
+        key: 'notification-send',
+        label: '通知发送管理',
+        icon: MessageSquare,
+        path: '/notification-send',
+      },
+      {
         key: 'permission',
         label: '权限管理',
         icon: Shield,
@@ -316,48 +360,44 @@ interface SidebarProps {
 
 // 将后端菜单转换为 Sidebar 菜单项格式
 const convertMenuToMenuItem = (menu: Menu): MenuItem | null => {
-  if (!menu.path && (!menu.children || menu.children.length === 0)) {
-    // 如果没有路径且没有子菜单，跳过
-    return null;
-  }
+  const mappedChildren = (menu.children || [])
+    .map((child) => convertMenuToMenuItem(child))
+    .filter((item): item is MenuItem => item !== null);
 
-  const hasChildren = menu.children && menu.children.length > 0;
-  const children = hasChildren
-    ? menu.children!.map(child => convertMenuToMenuItem(child)).filter((item): item is MenuItem => item !== null)
-    : undefined;
+  const children = mappedChildren.length > 0 ? mappedChildren : undefined;
+  const hasChildren = !!children;
+  const hasPath = !!menu.path;
 
   return {
     key: menu.id,
     label: menu.name,
     icon: getIconComponent(menu.icon),
-    path: menu.path || undefined,
+    path: hasPath ? menu.path : undefined,
     children,
-    group: hasChildren && !menu.path, // 有子菜单且没有路径的是分组标题
+    // 无 path 的菜单当作分组标题展示（即使暂时没有子菜单，也展示出来，避免“接口有数据但侧边栏不显示”）
+    group: !hasPath,
   };
 };
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
   const location = useLocation();
   const { menus: apiMenus, loading } = useMenuContext();
-  const [expandedGroups, setExpandedGroups] = useState<string[]>(['correction', 'community', 'training', 'content', 'system']);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(['users', 'correction', 'community', 'training', 'content', 'system']);
 
   // 将后端菜单转换为侧边栏菜单项
-  // 暂时强制使用默认菜单，确保所有功能正常访问
-  // 如果需要使用API菜单，可以在这里取消注释并启用API菜单逻辑
+  // 优先使用API菜单，如果API菜单数据不足则回退到默认菜单
   const menuItems = useMemo(() => {
-    // 暂时禁用API菜单，直接使用默认菜单
-    // TODO: 等后端菜单数据完善后，再启用API菜单功能
-    /*
-    if (apiMenus && apiMenus.length >= 10) {
+    if (apiMenus && apiMenus.length > 0) {
       const converted = apiMenus
         .map(menu => convertMenuToMenuItem(menu))
         .filter((item): item is MenuItem => item !== null);
       
-      if (converted.length >= 10) {
+      // 如果转换后的菜单数量足够，使用API菜单
+      if (converted.length > 0) {
         return converted;
       }
     }
-    */
+    // API菜单数据不足时，回退到默认菜单
     return defaultMenuItems;
   }, [apiMenus]);
 
@@ -406,13 +446,16 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
     const hasActive = hasActiveChild(item);
     const isGroup = item.group || (item.children && item.children.length > 0);
     const expanded = isGroup && isGroupExpanded(item.key);
+    const canExpand = !!(item.children && item.children.length > 0);
 
     if (isGroup && !item.path) {
       // 分组标题
       return (
         <div key={item.key} className="mb-1">
           <button
-            onClick={() => toggleGroup(item.key)}
+            onClick={() => {
+              if (canExpand) toggleGroup(item.key);
+            }}
             className={clsx(
               'w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded text-sm font-medium transition-colors',
               {
@@ -425,7 +468,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
               <Icon className="w-5 h-5 flex-shrink-0" />
               {!collapsed && <span>{item.label}</span>}
             </div>
-            {!collapsed && (
+            {!collapsed && canExpand && (
               expanded ? (
                 <ChevronDown className="w-4 h-4" />
               ) : (

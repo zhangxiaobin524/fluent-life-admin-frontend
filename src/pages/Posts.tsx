@@ -3,7 +3,7 @@ import { adminAPI } from '../services/api';
 import { Post } from '../types/index';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
-import { Search, Trash2 } from 'lucide-react';
+import { Search, Trash2, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { Column } from '../components/common/Table';
 
@@ -71,6 +71,36 @@ const Posts: React.FC = () => {
       console.error('删除帖子失败:', error);
       alert('删除失败，请重试');
     }
+  };
+
+  const handleExportData = () => {
+    const exportData = {
+      export_time: new Date().toISOString(),
+      filter: {
+        keyword: keyword || '全部',
+      },
+      total: total,
+      posts: posts.map(post => ({
+        id: post.id,
+        content: post.content,
+        tag: post.tag,
+        user: post.user?.username || '匿名用户',
+        likes_count: post.likes_count,
+        comments_count: post.comments_count,
+        created_at: post.created_at,
+      })),
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const dateStr = new Date().toISOString().split('T')[0];
+    a.download = `帖子数据_${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const columns: Column<Post>[] = [
@@ -174,17 +204,27 @@ const Posts: React.FC = () => {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          <button
-            onClick={() => handleBatchDelete(selectedPostIds)}
-            disabled={selectedPostIds.length === 0}
-            className={`ml-4 px-4 py-2 rounded text-white text-sm font-medium transition-colors ${
-              selectedPostIds.length === 0
-                ? 'bg-red-300 cursor-not-allowed'
-                : 'bg-red-600 hover:bg-red-700'
-            }`}
-          >
-            批量删除 ({selectedPostIds.length})
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleExportData}
+              className="px-4 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              导出数据
+            </button>
+            <button
+              onClick={() => handleBatchDelete(selectedPostIds)}
+              disabled={selectedPostIds.length === 0}
+              className={`px-4 py-2 rounded text-white text-sm font-medium transition-colors flex items-center gap-2 ${
+                selectedPostIds.length === 0
+                  ? 'bg-red-300 cursor-not-allowed'
+                  : 'bg-red-600 hover:bg-red-700'
+              }`}
+            >
+              <Trash2 className="w-4 h-4" />
+              批量删除 ({selectedPostIds.length})
+            </button>
+          </div>
         </div>
         <Table
           columns={columns}

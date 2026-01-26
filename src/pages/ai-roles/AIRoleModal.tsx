@@ -13,6 +13,7 @@ interface AIRole {
   system_prompt: string;
   voice_type: string;
   enabled: boolean;
+  is_premium: boolean; // 是否为高级角色（需要会员）
 }
 
 interface Props {
@@ -29,6 +30,7 @@ const AIRoleModal: React.FC<Props> = ({ visible, editingItem, onClose }) => {
     system_prompt: '',
     voice_type: '',
     enabled: true,
+    is_premium: false,
   });
   const [loading, setLoading] = useState(false);
   const [voiceTypeOptions, setVoiceTypeOptions] = useState<{ value: string; label: string }[]>([]);
@@ -42,7 +44,10 @@ const AIRoleModal: React.FC<Props> = ({ visible, editingItem, onClose }) => {
 
   useEffect(() => {
     if (editingItem) {
-      setFormData(editingItem);
+      setFormData({
+        ...editingItem,
+        is_premium: editingItem.is_premium || false,
+      });
     } else {
       setFormData({
         id: '',
@@ -51,6 +56,7 @@ const AIRoleModal: React.FC<Props> = ({ visible, editingItem, onClose }) => {
         system_prompt: '',
         voice_type: voiceTypeOptions[0]?.value || '',
         enabled: true,
+        is_premium: false,
       });
     }
   }, [editingItem, voiceTypeOptions]);
@@ -176,6 +182,18 @@ const AIRoleModal: React.FC<Props> = ({ visible, editingItem, onClose }) => {
                 { value: 'false', label: '禁用' },
               ]}
             />
+          </FormItem>
+
+          <FormItem label="高级角色">
+            <Select
+              value={formData.is_premium ? 'true' : 'false'}
+              onChange={(e) => setFormData({ ...formData, is_premium: e.target.value === 'true' })}
+              options={[
+                { value: 'false', label: '否（免费用户可用）' },
+                { value: 'true', label: '是（仅会员可用）' },
+              ]}
+            />
+            <p className="text-xs text-gray-500 mt-1">高级角色仅限会员用户使用，免费用户无法使用此角色</p>
           </FormItem>
         </div>
 

@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { adminAPI } from '../../services/api';
 import Card from '../../components/common/Card';
-import { Users, TrendingUp, Activity, Clock, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
+import { Users, TrendingUp, Activity, Clock, BarChart3 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const UserBehavior: React.FC = () => {
   const [stats, setStats] = useState<any>(null);
   const [activityTrend, setActivityTrend] = useState<any[]>([]);
   const [functionUsage, setFunctionUsage] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
-    setLoading(true);
     try {
       const [statsRes, trendRes, usageRes] = await Promise.all([
         adminAPI.getUserBehaviorStats(),
@@ -34,8 +32,6 @@ const UserBehavior: React.FC = () => {
       }
     } catch (error) {
       console.error('加载用户行为数据失败:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -172,7 +168,7 @@ const UserBehavior: React.FC = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }: { name?: string; percent?: number }) => `${name || ''} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"

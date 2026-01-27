@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { adminAPI } from '../../services/api';
 import Card from '../../components/common/Card';
-import { Users, Activity, TrendingUp, Clock, Download, FileText } from 'lucide-react';
+import { Users, Activity, TrendingUp, Clock, Download } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const Dashboard: React.FC = () => {
@@ -197,12 +197,12 @@ const Dashboard: React.FC = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }: { name?: string; percent?: number }) => `${name || ''} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
               >
-                {trainingTypeData.map((entry, index) => (
+                {trainingTypeData.map((_entry: { name: string; value: number }, index: number) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>

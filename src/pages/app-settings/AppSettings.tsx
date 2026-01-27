@@ -6,7 +6,7 @@ import Button from '../../components/form/Button';
 import FormItem from '../../components/form/FormItem';
 import Input from '../../components/form/Input';
 import Textarea from '../../components/form/Textarea';
-import { Plus, Edit, Trash2, Settings, Power, PowerOff, AlertTriangle, CreditCard, TestTube, Save } from 'lucide-react';
+import { Plus, Edit, Trash2, Settings, Power, AlertTriangle, CreditCard, TestTube, Save } from 'lucide-react';
 import AppSettingModal from './AppSettingModal';
 
 interface AppSetting {

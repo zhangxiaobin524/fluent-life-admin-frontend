@@ -579,8 +579,7 @@ const MeditationAssetsPage: React.FC = () => {
     // 关联音频播放使用的是虚拟 ID：linked-${imageId}-${audioId}
     // 该 ID 不会出现在 assets 中，否则会被错误地当成“资源不存在”从而立刻暂停。
     if (playingAudioId.startsWith('linked-')) {
-      const parts = playingAudioId.split('-');
-      // parts: ["linked", imageId(with hyphens...), audioId(with hyphens...)] —— split('-') 不可靠
+      // 注意：split('-') 不可靠，因为 UUID 里也有 '-'
       // 因为 UUID 里也有 '-'，这里用前缀 + 第一个 UUID 长度不固定会出错，所以只做“不过度停止”的兜底：
       // 如果正在播放的是 linked 虚拟音频，交由用户点击暂停/切换时手动停止。
       return;
@@ -659,7 +658,7 @@ const MeditationAssetsPage: React.FC = () => {
         key: 'drag',
         title: '',
         width: '40px',
-        render: (_: any, record: MeditationAsset, index: number) => (
+        render: (_: any, _record: MeditationAsset, index: number) => (
           <div
             draggable
             onDragStart={(e) => {
@@ -996,7 +995,7 @@ const MeditationAssetsPage: React.FC = () => {
           columns={columns}
           dataSource={assets}
           loading={loading}
-          onRow={(record: MeditationAsset, index: number) => ({
+          onRow={(_record: MeditationAsset, index: number) => ({
             draggable: true,
             onDragOver: (e: React.DragEvent) => handleDragOver(e, index),
             onDragLeave: handleDragLeave,

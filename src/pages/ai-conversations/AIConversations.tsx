@@ -123,7 +123,7 @@ const AIConversations: React.FC = () => {
           onChange={(e) => handleSelectAll(e.target.checked)}
         />
       ),
-      render: (value: any, record: AIConversation) => (
+      render: (_value: any, record: AIConversation) => (
         <input
           type="checkbox"
           checked={selectedConversationIds.includes(record.id)}
@@ -134,7 +134,7 @@ const AIConversations: React.FC = () => {
     {
       key: 'user',
       title: '用户',
-      render: (value: any, record: AIConversation) => (
+      render: (_value: any, record: AIConversation) => (
         <div className="flex items-center gap-2">
           {record.user?.avatar_url ? (
             <img src={record.user.avatar_url} alt={record.user.username} className="w-8 h-8 rounded-full" />
@@ -150,12 +150,12 @@ const AIConversations: React.FC = () => {
     {
       key: 'message_count',
       title: '消息数量',
-      render: (value: any, record: AIConversation) => record.messages?.length || 0,
+      render: (_value: any, record: AIConversation) => record.messages?.length || 0,
     },
     {
       key: 'last_message',
       title: '最后消息',
-      render: (value: any, record: AIConversation) => {
+      render: (_value: any, record: AIConversation) => {
         const lastMessage = record.messages && record.messages.length > 0 
           ? record.messages[record.messages.length - 1] 
           : null;
@@ -171,17 +171,17 @@ const AIConversations: React.FC = () => {
     {
       key: 'created_at',
       title: '创建时间',
-      render: (value: any, record: AIConversation) => format(new Date(record.created_at), 'yyyy-MM-dd HH:mm:ss'),
+      render: (_value: any, record: AIConversation) => format(new Date(record.created_at), 'yyyy-MM-dd HH:mm:ss'),
     },
     {
       key: 'updated_at',
       title: '更新时间',
-      render: (value: any, record: AIConversation) => format(new Date(record.updated_at), 'yyyy-MM-dd HH:mm:ss'),
+      render: (_value: any, record: AIConversation) => format(new Date(record.updated_at), 'yyyy-MM-dd HH:mm:ss'),
     },
     {
       key: 'actions',
       title: '操作',
-      render: (value: any, record: AIConversation) => (
+      render: (_value: any, record: AIConversation) => (
         <div className="flex gap-2">
           <button
             onClick={() => handleViewDetail(record)}

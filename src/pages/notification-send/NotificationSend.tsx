@@ -3,7 +3,7 @@ import { adminAPI } from '../../services/api';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/form/Button';
-import { Send, History, Users, MessageSquare } from 'lucide-react';
+import { Send, History } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Notification {

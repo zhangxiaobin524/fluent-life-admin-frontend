@@ -365,7 +365,6 @@ const convertMenuToMenuItem = (menu: Menu): MenuItem | null => {
     .filter((item): item is MenuItem => item !== null);
 
   const children = mappedChildren.length > 0 ? mappedChildren : undefined;
-  const hasChildren = !!children;
   const hasPath = !!menu.path;
 
   return {

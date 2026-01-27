@@ -5,7 +5,7 @@ import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/form/Button';
 import UserModal from '../users/UserModal';
-import { Plus, Edit, Trash2, Shield, Search, User as UserIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, User as UserIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
 const Admins: React.FC = () => {
@@ -93,7 +93,7 @@ const Admins: React.FC = () => {
       key: 'username',
       title: '用户名',
       dataIndex: 'username' as keyof User,
-      render: (value: string, record: User) => (
+      render: (value: string) => (
         <div className="flex items-center gap-2">
           <UserIcon className="w-4 h-4 text-gray-400" />
           <span className="font-medium">{value}</span>

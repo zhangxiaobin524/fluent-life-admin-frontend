@@ -3,7 +3,7 @@ import { adminAPI } from '../services/api';
 import { TrainingRecord } from '../types/index';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
-import { Activity, TrendingUp, Clock, Edit, Trash2, Eye, Download, Upload } from 'lucide-react';
+import { Activity, TrendingUp, Clock, Edit, Trash2, Eye, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 

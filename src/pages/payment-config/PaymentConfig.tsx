@@ -5,7 +5,7 @@ import Button from '../../components/form/Button';
 import FormItem from '../../components/form/FormItem';
 import Input from '../../components/form/Input';
 import Textarea from '../../components/form/Textarea';
-import { Save, TestTube, CheckCircle, XCircle, AlertCircle, CreditCard } from 'lucide-react';
+import { Save, TestTube, AlertCircle, CreditCard } from 'lucide-react';
 
 interface PaymentConfig {
   id?: string;

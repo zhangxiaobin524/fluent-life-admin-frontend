@@ -13,7 +13,7 @@ interface AIRole {
   system_prompt: string;
   voice_type: string;
   enabled: boolean;
-  is_premium: boolean; // 是否为高级角色（需要会员）
+  is_premium?: boolean; // 是否为高级角色（需要会员）
 }
 
 interface Props {

@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { captureException } from '../utils/monitoring';
 
-const API_BASE_URL = (import.meta as any)?.env?.VITE_API_BASE_URL || 'http://localhost:8082/api/v1';
+const API_BASE_URL = '/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { captureException } from '../utils/monitoring';
 
-const API_BASE_URL = 'http://localhost:8082/api/v1';
+const API_BASE_URL = (import.meta as any)?.env?.VITE_API_BASE_URL || 'http://localhost:8082/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -266,6 +266,36 @@ export const adminAPI = {
   // 每日朗诵文案管理
   getDailyExpressions: async (params: { page?: number; page_size?: number; keyword?: string; is_active?: string }) => {
     const response = await api.get('/admin/daily-expressions', { params });
+    return response.data;
+  },
+  getDailyExpressionAutoSyncSetting: async () => {
+    const response = await api.get('/admin/daily-expressions/auto-sync-setting');
+    return response.data;
+  },
+  updateDailyExpressionAutoSyncSetting: async (enabled: boolean, syncTime?: string, useGPT?: boolean, gptModel?: string) => {
+    const payload: any = { enabled };
+    if (syncTime) {
+      payload.sync_time = syncTime;
+    }
+    if (useGPT !== undefined) {
+      payload.use_gpt = useGPT;
+    }
+    if (gptModel) {
+      payload.gpt_model = gptModel;
+    }
+    const response = await api.put('/admin/daily-expressions/auto-sync-setting', payload);
+    return response.data;
+  },
+  updateDailyExpressionGPTConfig: async (apiKey: string, model?: string) => {
+    const payload: any = { api_key: apiKey };
+    if (model) {
+      payload.model = model;
+    }
+    const response = await api.put('/admin/daily-expressions/gpt-config', payload);
+    return response.data;
+  },
+  getDailyExpressionSyncLogs: async (params?: { page?: number; page_size?: number; date?: string }) => {
+    const response = await api.get('/admin/daily-expressions/sync-logs', { params });
     return response.data;
   },
   getDailyExpression: async (id: string) => {

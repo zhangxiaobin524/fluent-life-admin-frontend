@@ -25,6 +25,7 @@ interface Step {
   scenario_list_content?: string;
   popup_configs?: string; // JSON字符串，包含多个弹窗配置
   icon: string;
+  courage_text?: string; // 语音鼓励认知文本
 }
 
 interface ExposureStepsModalProps {
@@ -54,6 +55,7 @@ const ExposureStepsModal: React.FC<ExposureStepsModalProps> = ({
     scenario_list_content: '',
     popup_configs: '[]', // JSON字符串，包含多个弹窗配置
     icon: '',
+    courage_text: '',
   });
   
   const [popupConfigs, setPopupConfigs] = useState<PopupConfig[]>([]);
@@ -94,6 +96,7 @@ const ExposureStepsModal: React.FC<ExposureStepsModalProps> = ({
       scenario_list_content: '',
       popup_configs: '[]',
       icon: '',
+      courage_text: '',
     });
     setPopupConfigs([]);
     setShowStepForm(true);
@@ -122,6 +125,7 @@ const ExposureStepsModal: React.FC<ExposureStepsModalProps> = ({
         scenario_list_content: step.scenario_list_content || '',
         popup_configs: step.popup_configs || '[]',
         icon: step.icon,
+        courage_text: step.courage_text || '',
       });
       setPopupConfigs(configs);
     setShowStepForm(true);
@@ -255,6 +259,7 @@ const ExposureStepsModal: React.FC<ExposureStepsModalProps> = ({
           scenario_list_content: formData.scenario_list_content || '',
           popup_configs: popupConfigsJson,
           icon: formData.icon,
+          courage_text: formData.courage_text || '',
         };
         console.log('发送更新数据:', updateData);
         console.log('tip_title值:', updateData.tip_title);
@@ -282,6 +287,7 @@ const ExposureStepsModal: React.FC<ExposureStepsModalProps> = ({
           scenario_list_content: formData.scenario_list_content || '',
           popup_configs: popupConfigsJson,
           icon: formData.icon,
+          courage_text: formData.courage_text || '',
         };
         console.log('发送创建数据:', createData);
         const response = await adminAPI.createExposureStep(module.id, createData);
@@ -458,6 +464,18 @@ const ExposureStepsModal: React.FC<ExposureStepsModalProps> = ({
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   支持多行文本，可以包含详细的执行步骤、注意事项等
+                </p>
+              </FormItem>
+
+              <FormItem label="语音鼓励认知（可选，给用户播放的一句话）">
+                <Textarea
+                  value={formData.courage_text}
+                  onChange={(e) => setFormData({ ...formData, courage_text: e.target.value })}
+                  placeholder="例如：就算有点卡壳也没关系，你已经比昨天更勇敢了。"
+                  rows={3}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  这里的一句话会优先用于生成语音鼓励；不填则自动从执行指南里截取。
                 </p>
               </FormItem>
 

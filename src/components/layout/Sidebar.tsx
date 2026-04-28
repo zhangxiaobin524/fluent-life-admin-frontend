@@ -151,12 +151,6 @@ const defaultMenuItems: MenuItem[] = [
         path: '/exposure-modules',
       },
       {
-        key: 'tongue-twisters',
-        label: '绕口令管理',
-        icon: MessageSquare,
-        path: '/tongue-twisters',
-      },
-      {
         key: 'daily-expressions',
         label: '每日朗诵文案',
         icon: BookOpen,
@@ -173,6 +167,20 @@ const defaultMenuItems: MenuItem[] = [
         label: '冥想资源管理',
         icon: Music,
         path: '/meditation-assets',
+      },
+    ],
+  },
+  {
+    key: 'subscription',
+    label: '订阅会员',
+    icon: Settings,
+    group: true,
+    children: [
+      {
+        key: 'subscription-plans',
+        label: '订阅方案',
+        icon: Settings,
+        path: '/subscription/plans',
       },
     ],
   },

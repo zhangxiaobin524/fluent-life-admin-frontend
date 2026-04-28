@@ -262,6 +262,22 @@ export const adminAPI = {
     const response = await api.post('/admin/tongue-twisters/delete-batch', { ids });
     return response.data;
   },
+  // 绕口令生成管理
+  generateDailyTongueTwisters: async () => {
+    const response = await api.post('/admin/tongue-twisters/generate');
+    return response.data;
+  },
+  getTongueTwisterSyncConfig: async () => {
+    const response = await api.get('/admin/tongue-twisters/sync-config');
+    return response.data;
+  },
+  updateTongueTwisterSyncConfig: async (syncTime: string, isEnabled: boolean) => {
+    const response = await api.put('/admin/tongue-twisters/sync-config', {
+      sync_time: syncTime,
+      is_enabled: isEnabled,
+    });
+    return response.data;
+  },
 
   // 每日朗诵文案管理
   getDailyExpressions: async (params: { page?: number; page_size?: number; keyword?: string; is_active?: string }) => {
@@ -866,6 +882,40 @@ export const adminAPI = {
   },
   getNotificationSendHistory: async (params?: { page?: number; page_size?: number }) => {
     const response = await api.get('/admin/notifications/send-history', { params });
+    return response.data;
+  },
+
+  // 订阅方案/权益管理
+  getSubscriptionPlans: async () => {
+    const response = await api.get('/admin/subscription/plans');
+    return response.data;
+  },
+  createSubscriptionPlan: async (data: any) => {
+    const response = await api.post('/admin/subscription/plans', data);
+    return response.data;
+  },
+  updateSubscriptionPlan: async (id: string, data: any) => {
+    const response = await api.put(`/admin/subscription/plans/${id}`, data);
+    return response.data;
+  },
+  deleteSubscriptionPlan: async (id: string) => {
+    const response = await api.delete(`/admin/subscription/plans/${id}`);
+    return response.data;
+  },
+  getSubscriptionPlanBenefits: async (planId: string) => {
+    const response = await api.get(`/admin/subscription/plans/${planId}/benefits`);
+    return response.data;
+  },
+  batchUpsertSubscriptionPlanBenefits: async (planId: string, benefits: Array<{ feature_key: string; limit_value: number; unit?: string; period?: string; is_enabled?: boolean }>) => {
+    const response = await api.post(`/admin/subscription/plans/${planId}/benefits:batch`, { benefits });
+    return response.data;
+  },
+  updateSubscriptionBenefit: async (benefitId: string, data: any) => {
+    const response = await api.put(`/admin/subscription/benefits/${benefitId}`, data);
+    return response.data;
+  },
+  deleteSubscriptionBenefit: async (benefitId: string) => {
+    const response = await api.delete(`/admin/subscription/benefits/${benefitId}`);
     return response.data;
   },
 

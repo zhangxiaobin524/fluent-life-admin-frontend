@@ -42,6 +42,8 @@ import Admins from './pages/admins';
 import Files from './pages/files';
 import UserBehavior from './pages/user-behavior';
 import NotificationSend from './pages/notification-send';
+import SubscriptionPlans from './pages/subscription/SubscriptionPlans';
+import SubscriptionPlanBenefits from './pages/subscription/SubscriptionPlanBenefits';
 import Layout from './components/Layout';
 
 function App() {
@@ -546,6 +548,30 @@ function App() {
             isAuthenticated ? (
               <Layout onLogout={() => setIsAuthenticated(false)}>
                 <NotificationSend />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/subscription/plans"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <SubscriptionPlans />
+              </Layout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/subscription/plans/:id/benefits"
+          element={
+            isAuthenticated ? (
+              <Layout onLogout={() => setIsAuthenticated(false)}>
+                <SubscriptionPlanBenefits />
               </Layout>
             ) : (
               <Navigate to="/login" replace />

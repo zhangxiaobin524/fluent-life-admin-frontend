@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Input, InputNumber, Modal, Select, Switch, Table, message } from 'antd';
+import { Button, InputNumber, Modal, Select, Switch, Table, message } from 'antd';
 
 import { adminAPI } from '../../services/api';
 import { FEATURE_KEY_MAP, FEATURE_KEY_OPTIONS } from '../../constants/featureKeys';

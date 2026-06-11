@@ -40,7 +40,6 @@ import SystemLogs from './pages/SystemLogs';
 import AIConversations from './pages/ai-conversations';
 import Admins from './pages/admins';
 import Files from './pages/files';
-import UserBehavior from './pages/user-behavior';
 import NotificationSend from './pages/notification-send';
 import SubscriptionPlans from './pages/subscription/SubscriptionPlans';
 import SubscriptionPlanBenefits from './pages/subscription/SubscriptionPlanBenefits';

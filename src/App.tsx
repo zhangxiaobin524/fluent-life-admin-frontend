@@ -535,7 +535,7 @@ function App() {
           element={
             isAuthenticated ? (
               <Layout onLogout={() => setIsAuthenticated(false)}>
-                <UserBehavior />
+                <CorrectionCenter />
               </Layout>
             ) : (
               <Navigate to="/login" replace />

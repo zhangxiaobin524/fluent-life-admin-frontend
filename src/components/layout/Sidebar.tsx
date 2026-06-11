@@ -116,7 +116,7 @@ const defaultMenuItems: MenuItem[] = [
     children: [
       {
         key: 'correction-center',
-        label: '训练统计',
+        label: '房间管理',
         icon: BarChart3,
         path: '/correction-center',
       },

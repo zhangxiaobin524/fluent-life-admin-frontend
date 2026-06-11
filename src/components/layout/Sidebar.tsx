@@ -95,12 +95,6 @@ const defaultMenuItems: MenuItem[] = [
         path: '/users',
       },
       {
-        key: 'user-behavior',
-        label: '用户行为分析',
-        icon: BarChart3,
-        path: '/user-behavior',
-      },
-      {
         key: 'admins',
         label: '管理员管理',
         icon: Users,
@@ -116,9 +110,9 @@ const defaultMenuItems: MenuItem[] = [
     children: [
       {
         key: 'correction-center',
-        label: '房间管理',
+        label: '用户行为分析',
         icon: BarChart3,
-        path: '/correction-center',
+        path: '/user-behavior',
       },
       {
         key: 'videos',

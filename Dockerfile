@@ -27,6 +27,7 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # 创建 Nginx 配置
 RUN echo 'server { \
     listen 5172; \
+    client_max_body_size 100m; \
     server_name _; \
     root /usr/share/nginx/html; \
     index index.html; \
